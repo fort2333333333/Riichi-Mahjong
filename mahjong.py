@@ -1039,7 +1039,7 @@ def cal_han(cal_han_user_input, cal_double, cal_lan):
                 st_han_output += f"{int(point_mangan[head][0])}"
         st.text(st_han_output)
 
-st.title("立直麻将计算器/Riichi Mahjong Calculator")
+st.title("立直麻将计算器/ Riichi_Mahjong_Calculator")
 lan = ["简体中文","English"].index(st.selectbox("语言/Language", ["简体中文","English"]))
 st.text(["若使用手机/平板，使用横屏获得更佳体验 OwO","If using phone/tablet, switch to landscape mode for better experience OwO"][lan])
 tab1, tab2 = st.tabs([f"{["点数计算机", "Point Calcuator"][lan]}", f"{["点数追踪", "Point Tracker"][lan]}"])
