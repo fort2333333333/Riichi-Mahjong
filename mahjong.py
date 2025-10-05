@@ -1,0 +1,1314 @@
+from itertools import combinations
+import re
+import streamlit as st
+import random
+
+def meld_check(meld_check_meld):
+    if len(meld_check_meld) == 3:
+        if meld_check_meld[0][1] == meld_check_meld[1][1] == meld_check_meld[2][1]:
+            meld_check_meld_number = [int(meld_check_meld[0][0]),int(meld_check_meld[1][0]),int(meld_check_meld[2][0])]
+            meld_check_meld_number.sort()
+            if meld_check_meld_number in [[1,2,3],[2,3,4],[3,4,5],[4,5,6],[5,6,7],[6,7,8],[7,8,9]]:
+                if meld_check_meld[0][1] != "z":
+                    return True
+                else:
+                    return False
+            elif meld_check_meld_number[0] == meld_check_meld_number[1] == meld_check_meld_number[2]:
+                return True
+            else:
+                return False
+        else:
+            return False
+    elif len(meld_check_meld) == 4:
+        if meld_check_meld[0] == meld_check_meld[1] == meld_check_meld[2] == meld_check_meld[3]:
+            return True
+        else:
+            return False
+    elif len(meld_check_meld) == 5:
+        if meld_check_meld[0] == meld_check_meld[1] == meld_check_meld[2] == meld_check_meld[3] and meld_check_meld[4] == "a":
+            return True
+        else:
+            return False
+    else:
+        return False
+
+
+def cal_han(cal_han_user_input, cal_double):
+    st_han_output = ""
+    ron_tsumo = {"0": "和", "1": "自摸"}
+    def print_total(print_total_total_tile):
+        re_st_han_output = ""
+        match print_total_total_tile[0]:
+            case "M":
+                print(f"一般和牌型 {ron_tsumo[info[0]]}：{ron_tsumo_tile}")
+                re_st_han_output += f"一般和牌型 {ron_tsumo[info[0]]}：{ron_tsumo_tile}\n"
+                print("手牌：", end="")
+                re_st_han_output += "手牌："
+                for print_total_meld in print_total_total_tile[1]:
+                    print(print_total_meld, end=" ")
+                    re_st_han_output += f"{print_total_meld} "
+                print("\n副露：", end="")
+                re_st_han_output += "\n副露："
+                for print_total_meld in print_total_total_tile[2]:
+                    print(print_total_meld, end=" ")
+                    re_st_han_output += f"{print_total_meld} "
+                if print_total_total_tile[2]:
+                    print()
+                    re_st_han_output += "\n"
+                else:
+                    print("(无)")
+                    re_st_han_output += "(无)\n"
+            case "Q":
+                print(f"七对子 {ron_tsumo[info[0]]}：{ron_tsumo_tile}")
+                re_st_han_output += f"七对子 {ron_tsumo[info[0]]}：{ron_tsumo_tile}\n"
+                print("手牌：", end="")
+                re_st_han_output += "手牌："
+                for print_total_meld in print_total_total_tile[1]:
+                    print(print_total_meld, end=" ")
+                    re_st_han_output += f"{print_total_meld} "
+                print()
+                re_st_han_output += "\n"
+            case "G":
+                print(f"国士无双 {ron_tsumo[info[0]]}：{ron_tsumo_tile}")
+                re_st_han_output += f"国士无双 {ron_tsumo[info[0]]}：{ron_tsumo_tile}\n"
+                print("手牌：", end="")
+                re_st_han_output += "手牌："
+                for print_total_meld in print_total_total_tile[1]:
+                    re_st_han_output += f"{print_total_meld} "
+                    print(print_total_meld, end=" ")
+                print()
+        print("-" * 50)
+        st.text(re_st_han_output)
+
+    # 获取手牌信息
+    user_input = cal_han_user_input
+    # 手牌（和的牌放最后），副露（面子间用"."隔开），其他信息，宝牌（宝牌+里宝牌（如果立直）+拔北宝牌（三麻）），场风+自风
+    # 其他信息：（0：荣，1：自摸）（0：没立直，1：立直，2：双立直）（0：无一发，1：立一发）（0：无枪杠，1：枪杠，2：岭上开花）（0：无天和，1：天和，2:地和，3：海底摸月/河底捞鱼）
+    # 例:2p3p4p5p6p7p4s5s5s6s7s6z6z3s,,01,1m6s,1z3z
+
+    user_input.replace(" ", "")
+    user_input = user_input.lower()
+
+    # 将手牌信息拆解成hand(手牌),melded(副露),info(其他信息),dora(宝牌),wind(风向)五个变量
+    if user_input.count(",") == 4:
+        hand, melded, info, dora, wind = user_input.split(",")
+    else:
+        return True
+    red_dora = []
+
+    # 处理hand(手牌):使用list存储手牌里每张牌
+    hand = re.findall(r"[0-9][mpsz]", hand)
+    for index, tile in enumerate(hand):
+        if tile[0] == "0":
+            hand[index] = "5" + tile[1]
+            red_dora.append(tile)
+    ron_tsumo_tile = hand[-1]
+
+    # 处理hand(手牌):决定雀头
+    possible_pair = []
+    for tile in hand:
+        if hand.count(tile) > 1:
+            possible_pair.append(tile)
+    possible_pair = set(possible_pair)
+    possible_pair = list(possible_pair)  # 列表→集合→列表是为了去重
+    if len(possible_pair) >= 7:
+        chiitoi = True
+    else:
+        chiitoi = False
+
+    # 处理hand(手牌):根据牌的种类(万索饼字)分组
+    grouped_hand = [[], [], [], []]
+    group_order = "mpsz"
+    for tile in hand:
+        grouped_hand[group_order.index(tile[1])].append(tile)
+
+    # 处理hand(手牌):再次筛选雀头
+    for index, pair in enumerate(possible_pair):
+        s_hand = hand.copy()
+        s_hand.remove(pair)
+        s_hand.remove(pair)
+        s_hand = "".join(s_hand)
+        if s_hand.count("m") % 3 != 0 or s_hand.count("p") % 3 != 0 or s_hand.count("z") % 3 != 0 or s_hand.count(
+                "s") % 3 != 0:
+            possible_pair[index] = ""
+    while "" in possible_pair:
+        possible_pair.remove("")
+
+    # 处理hand(手牌):筛选满足条件的面子
+    all_combinations = [[], [], [], []]
+    satisfied_meld = [[], [], [], []]
+    for index, meld_type in enumerate(grouped_hand):
+        all_combinations[index] = list(combinations(meld_type, 3))
+    for index, meld_type in enumerate(all_combinations):
+        for meld in meld_type:
+            meld = list(meld)
+            meld.sort()
+            if meld_check(meld) and satisfied_meld[index].count(meld) < 4:
+                satisfied_meld[index].append(meld)
+
+    # 处理hand(手牌):组合所有满足条件的面子/雀头
+    satisfied_hand = []
+    for pair_index, pair in enumerate(possible_pair):
+        satisfied_hand.append([[], [], [], [], [pair + pair]])
+        for index, meld_type in enumerate(grouped_hand):
+            for meld_type_combination in combinations(satisfied_meld[index], len(meld_type) // 3):
+                meld_type_combination = sorted(meld_type_combination)
+                if meld_type_combination:
+                    if pair[1] == meld_type_combination[0][0][1]:
+                        all_meld = [pair, pair]
+                    else:
+                        all_meld = []
+                else:
+                    all_meld = []
+                for meld in meld_type_combination:
+                    for tile in meld:
+                        all_meld.append(tile)
+                all_meld.sort()
+                if all_meld == sorted(grouped_hand[index]):
+                    meld_type_combination_string = ""
+                    for meld in meld_type_combination:
+                        for tile in meld:
+                            meld_type_combination_string += tile
+                    if meld_type_combination_string not in satisfied_hand[pair_index][index]:
+                        satisfied_hand[pair_index][index].append(meld_type_combination_string)
+
+    grouped_satisfied_hand = []
+    for index, melds in enumerate(satisfied_hand):
+        for i in range(4):
+            if not melds[i]:
+                satisfied_hand[index][i].append("")
+    for melds in satisfied_hand:
+        for m_meld in melds[0]:
+            for s_meld in melds[1]:
+                for p_meld in melds[2]:
+                    for z_meld in melds[3]:
+                        if len(m_meld + s_meld + p_meld + z_meld + melds[4][0]) == len(hand) * 2:
+                            grouped_satisfied_hand.append(m_meld + s_meld + p_meld + z_meld + melds[4][0] + "M")
+
+    if not grouped_satisfied_hand and len(hand) == 2 and possible_pair:
+        grouped_satisfied_hand.append(possible_pair[0] * 2)
+
+    if chiitoi:
+        chiitoi_hand = ""
+        for tile in sorted(hand):
+            chiitoi_hand += tile
+        grouped_satisfied_hand.append(chiitoi_hand + "Q")
+
+    kokushi_check = ["1m", "9m", "1s", "9s", "1p", "9p", "1z", "2z", "3z", "4z", "5z", "6z", "7z"]
+    kokushi_pair_check = ["1m", "9m", "1s", "9s", "1p", "9p", "1z", "2z", "3z", "4z", "5z", "6z", "7z"]
+    kokushi_count_check = 0
+    kokushi_pair_count_check = 0
+    kokushi_hand = ""
+    for tile in hand:
+        if tile in kokushi_check:
+            kokushi_check.remove(tile)
+            kokushi_count_check += 1
+        elif tile in kokushi_pair_check:
+            kokushi_pair_count_check += 1
+    if kokushi_count_check == 13 and kokushi_pair_count_check == 1:
+        for tile in sorted(hand):
+            kokushi_hand += tile
+        grouped_satisfied_hand.append(kokushi_hand + "G")
+
+    for index, possible_hand in enumerate(grouped_satisfied_hand):
+        match possible_hand[-1]:
+            case "M":
+                grouped_satisfied_hand[index] = []
+                for i in range(len(possible_hand) // 6):
+                    grouped_satisfied_hand[index].append(possible_hand[i * 6:i * 6 + 6])
+                else:
+                    grouped_satisfied_hand[index].append(possible_hand[-5:-1])
+                    grouped_satisfied_hand[index].append(possible_hand[-1])
+            case "Q":
+                grouped_satisfied_hand[index] = []
+                for i in range(7):
+                    grouped_satisfied_hand[index].append(possible_hand[i * 4:i * 4 + 4])
+                else:
+                    grouped_satisfied_hand[index].append(possible_hand[-1])
+            case "G":
+                grouped_satisfied_hand[index] = []
+                for i in range(14):
+                    grouped_satisfied_hand[index].append(possible_hand[i * 2:i * 2 + 2])
+                else:
+                    grouped_satisfied_hand[index].append(possible_hand[-1])
+                pass
+
+    # 处理melded(副露):使用list存储副露区的每个面子和每张牌
+    if "." in melded:
+        melded = melded.split(".")
+    else:
+        melded = [melded]
+    for index, meld in enumerate(melded):
+        if len(meld) == 9:
+            melded[index] = re.findall(r"[0-9][mpsz]|a", meld)
+        else:
+            melded[index] = re.findall(r"[0-9][mpsz]", meld)
+    for index, meld in enumerate(melded):
+        for tile_index, tile in enumerate(meld):
+            if tile[0] == "0":
+                melded[index][tile_index] = "5" + tile[1]
+                red_dora.append(tile)
+
+    # 处理melded(副露):检查每个面子并存储
+    menzen = True
+    checked_melded = []
+    for meld in melded:
+        meld = sorted(meld)
+        if meld_check(meld):
+            checked_melded.append("".join(meld))
+            if len(meld) != 5:
+                menzen = False
+
+    # 合并han(手牌)和melded(副露)并检查
+    raw_total_tile = []
+    for tile in hand:
+        raw_total_tile.append(tile)
+    for tile in checked_melded:
+        raw_total_tile.append(tile[0:2])
+        raw_total_tile.append(tile[2:4])
+        raw_total_tile.append(tile[4:6])
+        if len(tile) > 6:
+            raw_total_tile.append(tile[6:8])
+    raw_total_tile = sorted(raw_total_tile)
+
+    all_total_tile = []
+    checked_total_tile = []
+
+    for index, checked_hand in enumerate(grouped_satisfied_hand):
+        all_total_tile.append([])
+        all_total_tile[index].append(checked_hand[-1])
+        all_total_tile[index].append(checked_hand[:-1])
+        all_total_tile[index].append(checked_melded)
+
+    for total_tile in all_total_tile:
+        match total_tile[0]:
+            case "M":
+                if len(total_tile[1]) + len(total_tile[2]) == 5:
+                    checked_total_tile.append(total_tile)
+            case "Q":
+                if len(total_tile[1]) == 7 and len(total_tile[2]) == 0:
+                    checked_total_tile.append(total_tile)
+            case "G":
+                if len(total_tile[1]) == 14 and len(total_tile[2]) == 0:
+                    checked_total_tile.append(total_tile)
+
+    if not checked_total_tile:
+        print("哥么这啥牌啊")
+        return True
+
+    # 处理info(其他信息):
+    for i in range(5 - len(info)):
+        info = info + "0"
+
+    # 处理dora(宝牌):
+    dora = re.findall(r"[1-9][mpsz]", dora)
+
+    # 处理wind(风向):
+    wind = re.findall(r"[1-4]z", wind)
+
+    # 计番(役满)
+    yakuman = []
+    yakuman_han = []
+    for index, total_tile in enumerate(checked_total_tile):
+        yakuman.append([])
+        yakuman_han.append(0)
+
+        # 天和
+        if info[4] == "1" and menzen and len(raw_total_tile) == 14 and info[0] == "1":
+            yakuman[index].append(["天和", "役满"])
+            yakuman_han[index] += 1
+
+        # 地和
+        if info[4] == "2" and menzen and len(raw_total_tile) == 14 and info[0] == "1":
+            yakuman[index].append(["地和", "役满"])
+            yakuman_han[index] += 1
+
+        # 大三元
+        if raw_total_tile.count("5z") >= 3 and raw_total_tile.count("6z") >= 3 and raw_total_tile.count("7z") >= 3:
+            yakuman[index].append(["大三元", "役满"])
+            yakuman_han[index] += 1
+
+        # 四暗刻/四暗刻单骑
+        closed_tri = 0
+        for meld in total_tile[1][:-1]:
+            if meld[0:2] == meld[2:4] == meld[4:6]:
+                closed_tri += 1
+        for meld in total_tile[2]:
+            if meld[-1] == "a":
+                closed_tri += 1
+        if closed_tri >= 4:
+            if ron_tsumo_tile in total_tile[1][-1] or info[4] == "1":
+                if cal_double:
+                    yakuman[index].append(["四暗刻单骑", "双倍役满"])
+                    yakuman_han[index] += 2
+                else:
+                    yakuman[index].append(["四暗刻单骑", "役满"])
+                    yakuman_han[index] += 1
+            elif info[0] == "1":
+                yakuman[index].append(["四暗刻", "役满"])
+                yakuman_han[index] += 1
+
+        # 字一色
+        tsuuiisou_check = True
+        for tile in raw_total_tile:
+            if tile[-1] != "z":
+                tsuuiisou_check = False
+        if tsuuiisou_check:
+            yakuman[index].append(["字一色", "役满"])
+            yakuman_han[index] += 1
+
+        # 绿一色
+        ryuuiisou_check = True
+        for tile in raw_total_tile:
+            if tile not in ["2s", "3s", "4s", "6s", "8s", "6z"]:
+                ryuuiisou_check = False
+        if ryuuiisou_check:
+            yakuman[index].append(["绿一色", "役满"])
+            yakuman_han[index] += 1
+
+        # 清老头
+        chinroutou_check = True
+        for tile in raw_total_tile:
+            if tile not in ["1s", "9s", "1p", "9p", "1m", "9m"]:
+                chinroutou_check = False
+        if chinroutou_check:
+            yakuman[index].append(["清老头", "役满"])
+            yakuman_han[index] += 1
+
+        # 国士无双/国士无双十三面
+        if total_tile[0] == "G":
+            if raw_total_tile.count(ron_tsumo_tile) == 2 or info[4] == "1":
+                if cal_double:
+                    yakuman[index].append(["国士无双十三面", "双倍役满"])
+                    yakuman_han[index] += 2
+                else:
+                    yakuman[index].append(["国士无双十三面", "役满"])
+                    yakuman_han[index] += 1
+            else:
+                yakuman[index].append(["国士无双", "役满"])
+                yakuman_han[index] += 1
+
+        # 小四喜/大四喜
+        suushii_tri = 0
+        suushii_pair = 0
+        for tile in ["1z", "2z", "3z", "4z"]:
+            if raw_total_tile.count(tile) == 2:
+                suushii_pair += 1
+            elif raw_total_tile.count(tile) >= 3:
+                suushii_tri += 1
+        if suushii_tri == 3 and suushii_pair == 1:
+            yakuman[index].append(["小四喜", "役满"])
+            yakuman_han[index] += 1
+        elif suushii_tri == 4:
+            if cal_double:
+                yakuman[index].append(["大四喜", "双倍役满"])
+                yakuman_han[index] += 2
+            else:
+                yakuman[index].append(["大四喜", "役满"])
+                yakuman_han[index] += 1
+
+        # 四杠子
+        if len(raw_total_tile) == 18:
+            yakuman[index].append(["四杠子", "役满"])
+            yakuman_han[index] += 1
+
+        # 九莲宝灯
+        type_count = [0, 0, 0, 0]
+        chinitsu_type = False
+        chuuren_check = False
+        pure_chuuren = False
+        for tile in raw_total_tile:
+            type_count[["m", "s", "p", "z"].index(tile[1])] += 1
+        if type_count.count(0) == 3 and type_count[3] == 0:
+            chinitsu_type = raw_total_tile[0][1]
+        chuuren = [str(i) + str(chinitsu_type) for i in range(1, 10)]
+        for i in ["1", "1", "9", "9"]:
+            chuuren.append(i + str(chinitsu_type))
+        for tile in [str(i) + str(chinitsu_type) for i in range(1, 10)]:
+            chuuren.append(tile)
+            chuuren.sort()
+            if chuuren == raw_total_tile:
+                chuuren_check = True
+                if tile == ron_tsumo_tile:
+                    pure_chuuren = True
+            else:
+                chuuren.remove(tile)
+        if not menzen:
+            chuuren_check = False
+        if chuuren_check:
+            if pure_chuuren or info[4] == "1":
+                if cal_double:
+                    yakuman[index].append(["纯正九莲宝灯", "双倍役满"])
+                    yakuman_han[index] += 2
+                else:
+                    yakuman[index].append(["纯正九莲宝灯", "役满"])
+                    yakuman_han[index] += 1
+            else:
+                yakuman[index].append(["九莲宝灯", "役满"])
+                yakuman_han[index] += 1
+
+    chinese_number = {1: "一", 2: "双", 3: "三", 4: "四", 5: "五", 6: "六", 7: "七", 8: "八", 9: "九"}
+
+    if max(yakuman_han) != 0:
+        max_index = yakuman_han.index(max(yakuman_han))
+        print_total(checked_total_tile[max_index])
+        if True:
+            if len(yakuman[max_index]) > 1:
+                for yaku in yakuman[max_index]:
+                    print(yaku[0] + " " + yaku[1])
+                    st_han_output += f"{yaku[0]} {yaku[1]}\n"
+                print(chinese_number[yakuman_han[max_index]] + "倍役满" + "!" * yakuman_han[max_index])
+                st_han_output += f"{chinese_number[yakuman_han[max_index]]}倍役满{"!" * yakuman_han[max_index]}\n"
+            else:
+                print(yakuman[max_index][0][0])
+                st_han_output += f"{yakuman[max_index][0][0]}\n"
+                print(yakuman[max_index][0][1] + "!" * yakuman_han[max_index])
+                st_han_output += f"{yakuman[max_index][0][1]}{"!" * yakuman_han[max_index]}\n"
+            st.text(st_han_output)
+            st_han_output = ""
+            print(f"庄家：{48000 * yakuman_han[max_index]}", end="")
+            st_han_output += f"庄家：{48000 * yakuman_han[max_index]}"
+            if info[0] == "1":
+                print(f"/{48000 * yakuman_han[max_index] // 3 * 2}({48000 * yakuman_han[max_index] // 3})")
+                st_han_output += f"/{48000 * yakuman_han[max_index] // 3 * 2}({48000 * yakuman_han[max_index] // 3})\n"
+            else:
+                print()
+                st_han_output += "\n"
+            print(f"子家：{32000 * yakuman_han[max_index]}", end="")
+            st_han_output += f"子家：{32000 * yakuman_han[max_index]}"
+            if info[0] == "1":
+                print(f"/{32000 * yakuman_han[max_index] // 2 + 32000 * yakuman_han[max_index] // 4}({32000 * yakuman_han[max_index] // 2},{32000 * yakuman_han[max_index] // 4})")
+                st_han_output += f"/{32000 * yakuman_han[max_index] // 2 + 32000 * yakuman_han[max_index] // 4}({32000 * yakuman_han[max_index] // 2},{32000 * yakuman_han[max_index] // 4})\n"
+            else:
+                print()
+                st_han_output += "\n"
+            st.text(st_han_output)
+            return True
+
+    # 计番(普通役)
+    non_yakuman = []
+    non_yakuman_han = []
+    for index, total_tile in enumerate(checked_total_tile):
+        non_yakuman.append([])
+        non_yakuman_han.append(0)
+
+        total_all_meld = []
+        if total_tile[0] == "M":
+            for meld in total_tile[1][:-1]:
+                total_all_meld.append(meld[0:6])
+            for meld in total_tile[2]:
+                total_all_meld.append(meld[0:6])
+        else:
+            for meld in total_tile[1]:
+                total_all_meld.append(meld[0:6])
+
+        # 立直/双立直
+        if info[1] == "1" and menzen:
+            non_yakuman[index].append(["立直", "1番"])
+            non_yakuman_han[index] += 1
+        elif info[1] == "2" and menzen:
+            non_yakuman[index].append(["双立直", "2番"])
+            non_yakuman_han[index] += 2
+
+        # 段幺九
+        tanyao_check = True
+        for tile in raw_total_tile:
+            if tile in ["1m", "9m", "1s", "9s", "1p", "9p", "1z", "2z", "3z", "4z", "5z", "6z", "7z"]:
+                tanyao_check = False
+        if tanyao_check:
+            non_yakuman[index].append(["段幺九", "1番"])
+            non_yakuman_han[index] += 1
+
+        # 门前清自摸和
+        if info[0] == "1" and menzen:
+            non_yakuman[index].append(["门前清自摸和", "1番"])
+            non_yakuman_han[index] += 1
+
+        # 役牌：自风牌
+        if raw_total_tile.count(wind[1]) >= 3:
+            non_yakuman[index].append(["役牌：自风牌", "1番"])
+            non_yakuman_han[index] += 1
+
+        # 役牌：场风牌
+        if raw_total_tile.count(wind[0]) >= 3:
+            non_yakuman[index].append(["役牌：场风牌", "1番"])
+            non_yakuman_han[index] += 1
+
+        # 役牌：三元牌
+        if raw_total_tile.count("5z") >= 3:
+            non_yakuman[index].append(["役牌：白", "1番"])
+            non_yakuman_han[index] += 1
+        if raw_total_tile.count("6z") >= 3:
+            non_yakuman[index].append(["役牌：发", "1番"])
+            non_yakuman_han[index] += 1
+        if raw_total_tile.count("7z") >= 3:
+            non_yakuman[index].append(["役牌：中", "1番"])
+            non_yakuman_han[index] += 1
+
+        # 平和
+        pinfu_check = 0
+        pinfu_last_tile_check = False
+        if menzen:
+            for meld in total_tile[1][:-1]:
+                if meld[0:2] != meld[2:4]:
+                    pinfu_check += 1
+                    if meld not in ["1s2s3s", "1m2m3m", "1p2p3p", "7s8s9s", "7m8m9m", "7p8p9p"]:
+                        if ron_tsumo_tile == meld[0:2] or ron_tsumo_tile == meld[4:6]:
+                            pinfu_last_tile_check = True
+                    else:
+                        if meld in ["1s2s3s", "1m2m3m", "1p2p3p"]:
+                            if ron_tsumo_tile == meld[0:2]:
+                                pinfu_last_tile_check = True
+                        else:
+                            if ron_tsumo_tile == meld[4:6]:
+                                pinfu_last_tile_check = True
+        if total_tile[1][-1][0:2] not in wind and total_tile[1][-1][0:2] not in ["5z", "6z", "7z"]:
+            pinfu_check += 1
+        if pinfu_check == 5 and pinfu_last_tile_check:
+            non_yakuman[index].append(["平和", "1番"])
+            non_yakuman_han[index] += 1
+
+        # 一杯口/二杯口
+        peikou = 0
+        for meld in total_tile[1][:-1]:
+            if meld[0:2] != meld[2:4] and total_tile[1].count(meld) >= 2:
+                peikou += 1
+        if peikou >= 4 and menzen:
+            non_yakuman[index].append(["二杯口", "3番"])
+            non_yakuman_han[index] += 3
+        elif peikou >= 2 and menzen:
+            non_yakuman[index].append(["一杯口", "1番"])
+            non_yakuman_han[index] += 1
+
+        # 一发
+        if ["岭上开花", "1番"] not in non_yakuman[index] and info[1] != "0" and info[2] == "1" and menzen:
+            non_yakuman[index].append(["一发", "1番"])
+            non_yakuman_han[index] += 1
+
+        # 岭上开花
+        if info[3] == "2" and info[0] == "1":
+            non_yakuman[index].append(["岭上开花", "1番"])
+            non_yakuman_han[index] += 1
+
+        # 枪杠
+        if info[3] == "1" and info[0] == "0":
+            non_yakuman[index].append(["枪杠", "1番"])
+            non_yakuman_han[index] += 1
+
+        # 海底摸月/河底捞鱼
+        if ["一发","1番"] in non_yakuman[index] and ["双立直", "2番"] in non_yakuman[index]:
+            pass
+        elif ["岭上开花", "1番"] in non_yakuman[index] or ["枪杠", "1番"] in non_yakuman[index]:
+            pass
+        else:
+            if info[4] == "3" and info[0] == "0":
+                non_yakuman[index].append(["河底捞鱼", "1番"])
+                non_yakuman_han[index] += 1
+            elif info[4] == "3" and info[0] == "1":
+                non_yakuman[index].append(["海底摸月", "1番"])
+                non_yakuman_han[index] += 1
+
+        # 三色同刻
+        sanshokudoukou = False
+        if "1m1m1m" in total_all_meld and "1p1p1p" in total_all_meld and "1s1s1s" in total_all_meld:
+            sanshokudoukou = True
+        elif "2m2m2m" in total_all_meld and "2p2p2p" in total_all_meld and "2s2s2s" in total_all_meld:
+            sanshokudoukou = True
+        elif "3m3m3m" in total_all_meld and "3p3p3p" in total_all_meld and "3s3s3s" in total_all_meld:
+            sanshokudoukou = True
+        elif "4m4m4m" in total_all_meld and "4p4p4p" in total_all_meld and "4s4s4s" in total_all_meld:
+            sanshokudoukou = True
+        elif "5m5m5m" in total_all_meld and "5p5p5p" in total_all_meld and "5s5s5s" in total_all_meld:
+            sanshokudoukou = True
+        elif "6m6m6m" in total_all_meld and "6p6p6p" in total_all_meld and "6s6s6s" in total_all_meld:
+            sanshokudoukou = True
+        elif "7m7m7m" in total_all_meld and "7p7p7p" in total_all_meld and "7s7s7s" in total_all_meld:
+            sanshokudoukou = True
+        elif "8m8m8m" in total_all_meld and "8p8p8p" in total_all_meld and "8s8s8s" in total_all_meld:
+            sanshokudoukou = True
+        elif "9m9m9m" in total_all_meld and "9p9p9p" in total_all_meld and "9s9s9s" in total_all_meld:
+            sanshokudoukou = True
+        if sanshokudoukou:
+            non_yakuman[index].append(["三色同刻", "2番"])
+            non_yakuman_han[index] += 2
+
+        # 三杠子
+        if len(raw_total_tile) == 17:
+            non_yakuman[index].append(["三杠子", "2番"])
+            non_yakuman_han[index] += 2
+
+        # 对对和
+        if total_tile[0] == "M":
+            if total_all_meld[0][0:2] == total_all_meld[0][2:4] and total_all_meld[1][0:2] == total_all_meld[1][2:4]:
+                if total_all_meld[2][0:2] == total_all_meld[2][2:4] and total_all_meld[3][0:2] == total_all_meld[3][
+                                                                                                  2:4]:
+                    non_yakuman[index].append(["对对和", "2番"])
+                    non_yakuman_han[index] += 2
+
+        # 三暗刻
+        san_closed_tri = 0
+        san_closed_tri_check = raw_total_tile.copy()
+        for meld in total_tile[1][:-1]:
+            if meld[0:2] == meld[2:4] == meld[4:6]:
+                san_closed_tri += 1
+                san_closed_tri_check.remove(meld[0:2])
+                san_closed_tri_check.remove(meld[2:4])
+                san_closed_tri_check.remove(meld[4:6])
+        for meld in total_tile[2]:
+            if meld[-1] == "a":
+                san_closed_tri += 1
+                for i in range(4):
+                    san_closed_tri_check.remove(meld[0:2])
+        if san_closed_tri == 3 and info[0] == "1":
+            non_yakuman[index].append(["三暗刻", "2番"])
+            non_yakuman_han[index] += 2
+        elif san_closed_tri == 3 and ron_tsumo_tile in san_closed_tri_check:
+            non_yakuman[index].append(["三暗刻", "2番"])
+            non_yakuman_han[index] += 2
+        elif san_closed_tri >= 4:
+            non_yakuman[index].append(["三暗刻", "2番"])
+            non_yakuman_han[index] += 2
+
+        # 小三元
+        shousangen = False
+        if raw_total_tile.count("5z") >= 3 and raw_total_tile.count("6z") >= 3 and raw_total_tile.count("7z") == 2:
+            shousangen = True
+        elif raw_total_tile.count("5z") >= 3 and raw_total_tile.count("6z") == 2 and raw_total_tile.count("7z") >= 3:
+            shousangen = True
+        elif raw_total_tile.count("5z") == 2 and raw_total_tile.count("6z") >= 3 and raw_total_tile.count("7z") >= 3:
+            shousangen = True
+        if shousangen:
+            non_yakuman[index].append(["小三元", "2番"])
+            non_yakuman_han[index] += 2
+
+        # 混老头/纯全带幺九/混全带幺九
+        honroutou = True
+        honchantaiyaochuu = 0
+        junchantaiyaochuu = 0
+        for tile in raw_total_tile:
+            if tile not in ["1m", "9m", "1s", "9s", "1p", "9p", "1z", "2z", "3z", "4z", "5z", "6z", "7z"]:
+                honroutou = False
+        if honroutou:
+            non_yakuman[index].append(["混老头", "2番"])
+            non_yakuman_han[index] += 2
+        elif total_tile[0] == "M":
+            for meld in total_tile[1]:
+                for tile in ["1m", "9m", "1s", "9s", "1p", "9p"]:
+                    if tile in meld:
+                        junchantaiyaochuu += 1
+                        break
+            for meld in total_tile[2]:
+                for tile in ["1m", "9m", "1s", "9s", "1p", "9p"]:
+                    if tile in meld:
+                        junchantaiyaochuu += 1
+                        break
+            if junchantaiyaochuu >= 5 and not menzen:
+                non_yakuman[index].append(["纯全带幺九", "2番"])
+                non_yakuman_han[index] += 2
+            elif junchantaiyaochuu >= 5 and menzen:
+                non_yakuman[index].append(["纯全带幺九", "3番"])
+                non_yakuman_han[index] += 3
+            else:
+                for meld in total_tile[1]:
+                    for tile in ["1m", "9m", "1s", "9s", "1p", "9p", "1z", "2z", "3z", "4z", "5z", "6z", "7z"]:
+                        if tile in meld:
+                            honchantaiyaochuu += 1
+                            break
+                for meld in total_tile[2]:
+                    for tile in ["1m", "9m", "1s", "9s", "1p", "9p", "1z", "2z", "3z", "4z", "5z", "6z", "7z"]:
+                        if tile in meld:
+                            honchantaiyaochuu += 1
+                            break
+                if honchantaiyaochuu >= 5 and not menzen:
+                    non_yakuman[index].append(["混全带幺九", "1番"])
+                    non_yakuman_han[index] += 1
+                elif honchantaiyaochuu >= 5 and menzen:
+                    non_yakuman[index].append(["混全带幺九", "2番"])
+                    non_yakuman_han[index] += 2
+
+        # 七对子
+        if total_tile[0] == "Q":
+            non_yakuman[index].append(["七对子", "2番"])
+            non_yakuman_han[index] += 2
+
+        # 一气通贯
+        ittsu = False
+        if total_tile[0] == "M":
+            if "1m2m3m" in total_all_meld and "4m5m6m" in total_all_meld and "7m8m9m" in total_all_meld:
+                ittsu = True
+            elif "1s2s3s" in total_all_meld and "4s5s6s" in total_all_meld and "7s8s9s" in total_all_meld:
+                ittsu = True
+            elif "1p2p3p" in total_all_meld and "4p5p6p" in total_all_meld and "7p8p9p" in total_all_meld:
+                ittsu = True
+            if ittsu and not menzen:
+                non_yakuman[index].append(["一气通贯", "1番"])
+                non_yakuman_han[index] += 1
+            elif ittsu and menzen:
+                non_yakuman[index].append(["一气通贯", "2番"])
+                non_yakuman_han[index] += 2
+
+        # 三色同顺
+        sanshokudoujun = False
+        if "1m2m3m" in total_all_meld and "1p2p3p" in total_all_meld and "1s2s3s" in total_all_meld:
+            sanshokudoukou = True
+        elif "2m3m4m" in total_all_meld and "2p3p4p" in total_all_meld and "2s3s4s" in total_all_meld:
+            sanshokudoukou = True
+        elif "3m4m5m" in total_all_meld and "3p4p5p" in total_all_meld and "3s4s5s" in total_all_meld:
+            sanshokudoukou = True
+        elif "4m5m6m" in total_all_meld and "4p5p6p" in total_all_meld and "4s5s6s" in total_all_meld:
+            sanshokudoukou = True
+        elif "5m6m7m" in total_all_meld and "5p6p7p" in total_all_meld and "5s6s7s" in total_all_meld:
+            sanshokudoukou = True
+        elif "6m7m8m" in total_all_meld and "6p7p8p" in total_all_meld and "6s7s8s" in total_all_meld:
+            sanshokudoukou = True
+        elif "7m8m9m" in total_all_meld and "7p8p9p" in total_all_meld and "7s8s9s" in total_all_meld:
+            sanshokudoukou = True
+        if sanshokudoukou and not menzen:
+            non_yakuman[index].append(["三色同顺", "1番"])
+            non_yakuman_han[index] += 1
+        elif sanshokudoukou and menzen:
+            non_yakuman[index].append(["三色同顺", "2番"])
+            non_yakuman_han[index] += 2
+
+        # 清一色/混一色
+        honitsu_type = ""
+        honitsu = True
+        if chinitsu_type and not menzen:
+            non_yakuman[index].append(["清一色", "5番"])
+            non_yakuman_han[index] += 5
+        elif chinitsu_type and menzen:
+            non_yakuman[index].append(["清一色", "6番"])
+            non_yakuman_han[index] += 6
+        else:
+            for tile in raw_total_tile:
+                if honitsu_type == "" and tile[1] != "z":
+                    honitsu_type = tile[1]
+                if tile[1] != "z" and tile[1] != honitsu_type:
+                    honitsu = False
+            if honitsu and not menzen:
+                non_yakuman[index].append(["混一色", "2番"])
+                non_yakuman_han[index] += 2
+            elif honitsu and menzen:
+                non_yakuman[index].append(["混一色", "3番"])
+                non_yakuman_han[index] += 3
+
+    if max(non_yakuman_han) == 0:
+        print("哥么你这牌有役吗")
+        for j in range(5):
+            st.text("666诈和都来了")
+        return True
+    else:
+        max_index = non_yakuman_han.index(max(non_yakuman_han))
+
+        # 宝牌/里宝牌
+        dora_count = 0
+        for tile in dora:
+            dora_count += raw_total_tile.count(tile)
+        if dora_count:
+            if ["立直", "1番"] in non_yakuman[max_index]:
+                non_yakuman[max_index].append(["宝牌/里宝牌", f"{dora_count}番"])
+            else:
+                non_yakuman[max_index].append(["宝牌", f"{dora_count}番"])
+        non_yakuman_han[max_index] += dora_count
+
+        # 红宝牌
+        if red_dora:
+            non_yakuman[max_index].append(["红宝牌", f"{len(red_dora)}番"])
+            non_yakuman_han[max_index] += len(red_dora)
+
+        # 拔北宝牌
+        if "8z" in dora:
+            eightz_count = dora.count("8z")
+            non_yakuman[max_index].append(["拔北宝牌", f"{eightz_count}番"])
+            non_yakuman_han[max_index] += dora.count("8z")
+
+        if dora_count == 0 and ["立直", "1番"] in non_yakuman[max_index] or ["双立直", "2番"] in non_yakuman[max_index]:
+            non_yakuman[max_index].append(["里宝牌", f"{dora_count}番"])
+
+        head = ""
+        fu = 20
+
+        if non_yakuman_han[max_index] >= 13:
+            head = "累计役满!!!!!"
+        elif non_yakuman_han[max_index] >= 11:
+            head = "三倍满!!!!"
+        elif non_yakuman_han[max_index] >= 8:
+            head = "倍满!!!"
+        elif non_yakuman_han[max_index] >= 6:
+            head = "跳满!!"
+        elif non_yakuman_han[max_index] >= 5:
+            head = "满贯!"
+        else:  # 计符
+            if checked_total_tile[max_index][0] == "Q":
+                fu = 25
+            else:
+                # 面子
+                for meld in checked_total_tile[max_index][1][:-1]:
+                    add_fu = 0
+                    if meld[0:2] == meld[2:4]:
+                        if info[0] == "1" or ron_tsumo_tile != meld[0:2]:
+                            add_fu = 2
+                        elif raw_total_tile.count(ron_tsumo_tile) > 3:
+                            add_fu = 2
+                        else:
+                            add_fu = 1
+                    if add_fu:
+                        if meld[0:2] in ["1m", "9m", "1s", "9s", "1p", "9p", "1z", "2z", "3z", "4z", "5z", "6z", "7z"]:
+                            fu += 4 * add_fu
+                        else:
+                            fu += 2 * add_fu
+
+                for meld in checked_total_tile[max_index][2]:
+                    add_fu = 0
+                    if meld[0:2] == meld[2:4]:
+                        match len(meld):
+                            case 6:
+                                add_fu = 1
+                            case 8:
+                                add_fu = 4
+                            case 9:
+                                add_fu = 8
+                    if add_fu:
+                        if meld[0:2] in ["1m", "9m", "1s", "9s", "1p", "9p", "1z", "2z", "3z", "4z", "5z", "6z", "7z"]:
+                            fu += 4 * add_fu
+                        else:
+                            fu += 2 * add_fu
+
+                # 雀头
+                if wind[0] in checked_total_tile[max_index][1][-1]:
+                    fu += 2
+                if wind[1] in checked_total_tile[max_index][1][-1]:
+                    fu += 2
+                if "5z" in checked_total_tile[max_index][1][-1] or "6z" in checked_total_tile[max_index][1][
+                    -1] or "7z" in \
+                        checked_total_tile[max_index][1][-1]:
+                    fu += 2
+
+                # 听牌
+                add_fu_last_tile_check = True
+                ten_add_fu = False
+                for meld in checked_total_tile[max_index][1][:-1]:
+                    if meld[0:2] != meld[2:4]:
+                        if meld not in ["1s2s3s", "1m2m3m", "1p2p3p", "7s8s9s", "7m8m9m", "7p8p9p"]:
+                            if ron_tsumo_tile == meld[0:2] or ron_tsumo_tile == meld[4:6]:
+                                add_fu_last_tile_check = False
+                        else:
+                            if meld in ["1s2s3s", "1m2m3m", "1p2p3p"]:
+                                if ron_tsumo_tile == meld[0:2]:
+                                    add_fu_last_tile_check = False
+                            else:
+                                if ron_tsumo_tile == meld[4:6]:
+                                    add_fu_last_tile_check = False
+                if add_fu_last_tile_check:
+                    for meld in checked_total_tile[max_index][1][:-1]:
+                        if meld[0:2] != meld[2:4] and ron_tsumo_tile in meld:
+                            if ron_tsumo_tile == meld[2:4]:
+                                ten_add_fu = True
+                            elif meld in ["1s2s3s", "1m2m3m", "1p2p3p"]:
+                                if ron_tsumo_tile == meld[4:6]:
+                                    ten_add_fu = True
+                            elif meld in ["7s8s9s", "7m8m9m", "7p8p9p"]:
+                                if ron_tsumo_tile == meld[0:2]:
+                                    ten_add_fu = True
+                    if ron_tsumo_tile in checked_total_tile[max_index][1][-1]:
+                        ten_add_fu = True
+                if ten_add_fu:
+                    fu += 2
+
+                # 和牌状态
+                if info[0] == "1" and ["平和", "1番"] not in non_yakuman[max_index]:
+                    fu += 2
+                if menzen and info[0] == "0":
+                    fu += 10
+
+            if not menzen and fu <= 30:
+                fu = 30
+
+            if fu != 25 and fu - fu // 10 * 10 != 0:
+                fu = fu // 10 * 10 + 10
+
+            if non_yakuman_han[max_index] == 3 and fu >= 70:
+                head = "满贯!"
+            elif non_yakuman_han[max_index] == 4 and fu >= 40:
+                head = "满贯!"
+
+        if head == "":
+            head = f"{fu}符"
+
+        print_total(checked_total_tile[max_index])
+        for yaku in non_yakuman[max_index]:
+            print(yaku[0] + " " + yaku[1])
+            st_han_output += f"{yaku[0]} {yaku[1]}\n"
+        print(f"{non_yakuman_han[max_index]}番 {head}")
+        st_han_output += f"{non_yakuman_han[max_index]}番 {head}\n"
+        st.text(st_han_output)
+        st_han_output = ""
+
+        ko_point = {(1, 30): (1000, 300, 500), (1, 40): (1300, 400, 700), (1, 50): (1600, 400, 800),
+                    (1, 60): (2000, 500, 1000), (1, 70): (2300, 600, 1200), (1, 80): (2600, 700, 1300),
+                    (1, 90): (2900, 800, 1500), (1, 100): (3200, 800, 1600), (1, 110): (3600, 900, 1800),
+                    (2, 20): (1300, 400, 700), (2, 25): (1600, 400, 800), (2, 30): (2000, 500, 1000),
+                    (2, 40): (2600, 700, 1300), (2, 50): (3200, 800, 1600), (2, 60): (3900, 1000, 2000),
+                    (2, 70): (4500, 1200, 2300), (2, 80): (5200, 1300, 2600), (2, 90): (5800, 1500, 2900),
+                    (2, 100): (6400, 1600, 3200), (2, 110): (7100, 1800, 3600), (3, 20): (2600, 700, 1300),
+                    (3, 25): (3200, 800, 1600), (3, 30): (3900, 1000, 2000), (3, 40): (5200, 1300, 2600),
+                    (3, 50): (6400, 1600, 3200), (3, 60): (7700, 2000, 3900), (4, 20): (5200, 1300, 2600),
+                    (4, 25): (6400, 1600, 3200), (4, 30): (7700, 2000, 3900)}
+        oya_point = {(1, 30): (1500, 500, 500), (1, 40): (2000, 700, 700), (1, 50): (2400, 800, 800),
+                     (1, 60): (2900, 1000, 1000), (1, 70): (3400, 1200, 1200), (1, 80): (3900, 1300, 1300),
+                     (1, 90): (4400, 1500, 1500), (1, 100): (4800, 1600, 1600), (1, 110): (5300, 1800, 1800),
+                     (2, 20): (2000, 700, 700), (2, 25): (2400, 800, 800), (2, 30): (2900, 1000, 1000),
+                     (2, 40): (3900, 1300, 1300), (2, 50): (4800, 1600, 1600), (2, 60): (5800, 2000, 2000),
+                     (2, 70): (6800, 2300, 2300), (2, 80): (7700, 2600, 2600), (2, 90): (8700, 2900, 2900),
+                     (2, 100): (9600, 3200, 3200), (2, 110): (10600, 3600, 3600), (3, 20): (3900, 1300, 1300),
+                     (3, 25): (4800, 1600, 1600), (3, 30): (5800, 2000, 2000), (3, 40): (7700, 2600, 2600),
+                     (3, 50): (9600, 3200, 3200), (3, 60): (11600, 3900, 3900), (4, 20): (7700, 2600, 2600),
+                     (4, 25): (9600, 3200, 3200), (4, 30): (11600, 3900, 3900)}
+        point_mangan = {"满贯!": (8000, 2000, 4000), "跳满!!": (12000, 3000, 6000), "倍满!!!": (16000, 4000, 8000),
+                        "三倍满!!!!": (24000, 6000, 12000), "累计役满!!!!!": (32000, 8000, 16000)}
+
+        print("-" * 50)
+        print("庄家：", end="")
+        st_han_output += "庄家："
+        if info[0] == "1":
+            if head[-1] == "符":
+                print(f"{oya_point[(non_yakuman_han[max_index], int(head[:-1]))][1] * 3}/{oya_point[(non_yakuman_han[max_index], int(head[:-1]))][1] * 2}({oya_point[(non_yakuman_han[max_index], int(head[:-1]))][1]})")
+                st_han_output += f"{oya_point[(non_yakuman_han[max_index], int(head[:-1]))][1] * 3}/{oya_point[(non_yakuman_han[max_index], int(head[:-1]))][1] * 2}({oya_point[(non_yakuman_han[max_index], int(head[:-1]))][1]})\n"
+            else:
+                print(f"{int(point_mangan[head][0] * 1.5)}/{point_mangan[head][2] * 2}({point_mangan[head][2]})")
+                st_han_output += f"{int(point_mangan[head][0] * 1.5)}/{point_mangan[head][2] * 2}({point_mangan[head][2]})\n"
+        elif info[0] == "0":
+            if head[-1] == "符":
+                print(oya_point[(non_yakuman_han[max_index], int(head[:-1]))][0])
+                st_han_output += f"{oya_point[(non_yakuman_han[max_index], int(head[:-1]))][0]}\n"
+            else:
+                print(int(point_mangan[head][0] * 1.5))
+                st_han_output += f"{int(point_mangan[head][0] * 1.5)}\n"
+        print("子家：", end="")
+        st_han_output += "子家："
+        if info[0] == "1":
+            if head[-1] == "符":
+                print(f"{ko_point[(non_yakuman_han[max_index], int(head[:-1]))][2] + ko_point[(non_yakuman_han[max_index], int(head[:-1]))][1] * 2}/{ko_point[(non_yakuman_han[max_index], int(head[:-1]))][2] + ko_point[(non_yakuman_han[max_index], int(head[:-1]))][1]}({ko_point[(non_yakuman_han[max_index], int(head[:-1]))][2]},{ko_point[(non_yakuman_han[max_index], int(head[:-1]))][1]})")
+                st_han_output += f"{ko_point[(non_yakuman_han[max_index], int(head[:-1]))][2] + ko_point[(non_yakuman_han[max_index], int(head[:-1]))][1] * 2}/{ko_point[(non_yakuman_han[max_index], int(head[:-1]))][2] + ko_point[(non_yakuman_han[max_index], int(head[:-1]))][1]}({ko_point[(non_yakuman_han[max_index], int(head[:-1]))][2]},{ko_point[(non_yakuman_han[max_index], int(head[:-1]))][1]})\n"
+            else:
+                print(f"{point_mangan[head][2] + point_mangan[head][1] * 2}/{point_mangan[head][2] + point_mangan[head][1]}({point_mangan[head][2]},{point_mangan[head][1]})")
+                st_han_output += f"{point_mangan[head][2] + point_mangan[head][1] * 2}/{point_mangan[head][2] + point_mangan[head][1]}({point_mangan[head][2]},{point_mangan[head][1]})\n"
+        elif info[0] == "0":
+            if head[-1] == "符":
+                print(ko_point[(non_yakuman_han[max_index], int(head[:-1]))][0])
+                st_han_output += f"{ko_point[(non_yakuman_han[max_index], int(head[:-1]))][0]}"
+            else:
+                print(int(point_mangan[head][0]))
+                st_han_output += f"{int(point_mangan[head][0])}"
+        st.text(st_han_output)
+
+#cal_han("1s2s3s7z7z,5z5z5z5za.6z6z6z6za.1z1z1z1za,11103,5z5z,1z1z")
+
+tab1, tab2 = st.tabs(["点数计算机", "点数追踪"])
+with tab1:
+    st.title("点数计算机")
+    ipt1 = st.text_input("手牌（将和的牌放在最后）").lower()
+    col11, col12, col13, col14 = st.columns(4)
+    with col11:
+        ipt2 = st.text_input("副露1").lower()
+    with col12:
+        ipt3 = st.text_input("副露2").lower()
+    with col13:
+        ipt4 = st.text_input("副露3").lower()
+    with col14:
+        ipt5 = st.text_input("副露4").lower()
+    ipt6 = st.selectbox("自摸/荣",["自摸","荣"])
+    ipt7 = st.multiselect("和牌状态",["立直","双立直","一发","枪杠","岭上开花","天和","地和","海底"])
+    col31, col32 = st.columns(2)
+    with col31:
+        ipt8 = st.text_input("宝牌指示牌（如果立直了请把里宝牌也加上）")
+    with col32:
+        ipt12 = st.slider("拔北宝牌", min_value=0, max_value=4, step=1)
+    col21, col22 = st.columns(2)
+    with col21:
+        ipt9 = st.selectbox("自风",["东","南","西","北"])
+    with col22:
+        ipt10 = st.selectbox("客风",["东","南","西","北"])
+    ipt11 = st.checkbox("国士无双十三面，纯正九莲宝灯，四暗刻单骑，大四喜是双倍役满", value=True)
+    try:
+        cal_ipt = ""
+        cal_ipt += ipt1
+        cal_ipt += ","
+        if ipt2:
+            cal_ipt += ipt2
+            cal_ipt += "."
+        if ipt3:
+            cal_ipt += ipt3
+            cal_ipt += "."
+        if ipt4:
+            cal_ipt += ipt4
+            cal_ipt += "."
+        if ipt5:
+            cal_ipt += ipt5
+            cal_ipt += "."
+        while cal_ipt[-1] == ".":
+            cal_ipt = cal_ipt[:-1]
+        cal_ipt += ","
+
+        if ipt6 == "自摸":
+            cal_ipt += "1"
+        else:
+            cal_ipt += "0"
+
+        if "双立直" in ipt7:
+            cal_ipt += "2"
+        elif "立直" in ipt7:
+            cal_ipt += "1"
+        else:
+            cal_ipt += "0"
+
+        if "一发" in ipt7:
+            cal_ipt += "1"
+        else:
+            cal_ipt += "0"
+
+        if "枪杠" in ipt7:
+            cal_ipt += "1"
+        elif "岭上开花" in ipt7:
+            cal_ipt += "2"
+        else:
+            cal_ipt += "0"
+
+        if "天和" in ipt7:
+            cal_ipt += "1,"
+        elif "地和" in ipt7:
+            cal_ipt += "2,"
+        elif "海底" in ipt7:
+            cal_ipt += "3,"
+        else:
+            cal_ipt += "0,"
+
+        dora_list = {"1s": "2s", "2s": "3s", "3s": "4s", "4s": "5s", "5s": "6s", "0s": "6s", "6s": "7s", "7s": "8s",
+                "8s": "9s", "9s": "1s",
+                "1p": "2p", "2p": "3p", "3p": "4p", "4p": "5p", "5p": "6p", "0p": "6p", "6p": "7p", "7p": "8p",
+                "8p": "9p", "9p": "1p",
+                "1m": "2m", "2m": "3m", "3m": "4m", "4m": "5m", "5m": "6m", "0m": "6m", "6m": "7m", "7m": "8m",
+                "8m": "9m", "9m": "1m",
+                "1z": "2z", "2z": "3z", "3z": "4z", "4z": "1z", "5z": "6z", "6z": "7z", "7z": "5z", "8z": "8z"}
+        ipt8 = re.findall(r"[0-9][mpsz]", ipt8)
+        for i in ipt8:
+            cal_ipt += dora_list[i]
+        cal_ipt += f"{"8z"*ipt12}"
+        cal_ipt += ","
+
+        cal_ipt += {"东":"1z","南":"2z","西":"3z","北":"4z"}[ipt9]
+        cal_ipt += {"东":"1z","南":"2z","西":"3z","北":"4z"}[ipt10]
+
+        cal_han(cal_ipt, ipt11)
+    except Exception:
+        pass
+
+with tab2:
+    error_message = ""
+    st.title("点数追踪")
+    tab4m, tab3m = st.tabs(["四人麻将","三人麻将"])
+    with tab4m:
+        if 'player_list4' not in st.session_state:
+            st.session_state.player_list4 = []
+        if "start4" not in st.session_state:
+            st.session_state.start4 = False
+        if "point_history4" not in st.session_state:
+            st.session_state.point_history4 = []
+        if st.session_state.start4 == False:
+            col51, col52 = st.columns([4,1])
+            with col51:
+                insert_player = st.chat_input("添加玩家")
+                if insert_player and insert_player not in st.session_state.player_list4 and len(
+                        st.session_state.player_list4) <= 4: st.session_state.player_list4.append(insert_player)
+            with col52:
+                if st.button("移除玩家"):
+                    try:
+                        st.session_state.player_list4.pop()
+                    except Exception:
+                        pass
+        player_col1, player_col2, player_col3, player_col4 = st.columns(4)
+        with player_col1:
+            if len(st.session_state.player_list4) >= 1:
+                st.markdown(f"<h2 style='text-align: center;'>{st.session_state.player_list4[0]}</h2>", unsafe_allow_html=True)
+                if st.session_state.start4 == True:
+                    st.markdown(f"<h3 style='text-align: center;'>{st.session_state.point_list4[0]}</h3>",unsafe_allow_html=True)
+        with player_col2:
+            if len(st.session_state.player_list4) >= 2:
+                st.markdown(f"<h2 style='text-align: center;'>{st.session_state.player_list4[1]}</h2>", unsafe_allow_html=True)
+                if st.session_state.start4 == True:
+                    st.markdown(f"<h3 style='text-align: center;'>{st.session_state.point_list4[1]}</h3>",unsafe_allow_html=True)
+        with player_col3:
+            if len(st.session_state.player_list4) >= 3:
+                st.markdown(f"<h2 style='text-align: center;'>{st.session_state.player_list4[2]}</h2>", unsafe_allow_html=True)
+                if st.session_state.start4 == True:
+                    st.markdown(f"<h3 style='text-align: center;'>{st.session_state.point_list4[2]}</h3>",unsafe_allow_html=True)
+        with player_col4:
+            if len(st.session_state.player_list4) >= 4:
+                st.markdown(f"<h2 style='text-align: center;'>{st.session_state.player_list4[3]}</h2>", unsafe_allow_html=True)
+                if st.session_state.start4 == True:
+                    st.markdown(f"<h3 style='text-align: center;'>{st.session_state.point_list4[3]}</h3>",unsafe_allow_html=True)
+        if len(st.session_state.player_list4) == 4:
+            if st.session_state.start4 == False:
+                start_point = st.number_input("起始点数", min_value = 0, max_value = 50000, value = 25000)
+                stick = st.number_input("场棒", min_value = 100, max_value = 500, value = 300)
+                st.session_state.stick4 = stick
+                notin = st.number_input("没听罚符", min_value = 500, max_value = 2000, value = 1000)
+                st.session_state.notin4 = notin
+                if st.button("开始对局"):
+                    st.session_state.start4 = True
+                    st.session_state.point_list4 = [start_point, start_point, start_point, start_point, 0]
+                    st.session_state.point_history4.append(st.session_state.point_list4.copy())
+                    st.rerun()
+            else:
+                st.markdown("<br>", unsafe_allow_html=True)
+                col41, col43, col44, col45, col46 = st.columns([2,1,1,1,1])
+                with col41:
+                    t_zhuang = st.select_slider("庄家",options=st.session_state.player_list4, value = st.session_state.player_list4[0])
+                with col43:
+                    if st.button(f"{st.session_state.player_list4[0]}\n立直"):
+                        st.session_state.point_list4[0] -= 1000
+                        st.session_state.point_list4[4] += 1000
+                        st.session_state.point_history4.append(st.session_state.point_list4.copy())
+                        st.rerun()
+                with col44:
+                    if st.button(f"{st.session_state.player_list4[1]}\n立直"):
+                        st.session_state.point_list4[1] -= 1000
+                        st.session_state.point_list4[4] += 1000
+                        st.session_state.point_history4.append(st.session_state.point_list4.copy())
+                        st.rerun()
+                with col45:
+                    if st.button(f"{st.session_state.player_list4[2]}\n立直"):
+                        st.session_state.point_list4[2] -= 1000
+                        st.session_state.point_list4[4] += 1000
+                        st.session_state.point_history4.append(st.session_state.point_list4.copy())
+                        st.rerun()
+                with col46:
+                    if st.button(f"{st.session_state.player_list4[3]}\n立直"):
+                        st.session_state.point_list4[3] -= 1000
+                        st.session_state.point_list4[4] += 1000
+                        st.session_state.point_history4.append(st.session_state.point_list4.copy())
+                        st.rerun()
+                col71, col72 = st.columns([2,9])
+                with col72:
+                    benchang4 = st.slider("本场数",min_value = 0, max_value = 15)
+                with col71:
+                    st.text(f"立直棒：{st.session_state.point_list4[4]}")
+                    st.text(f"本场棒：{st.session_state.stick4*benchang4}")
+                col51, col52, col53, col54 = st.columns([2, 3, 3, 3])
+                with col52:
+                    winner4 = st.select_slider("和牌",options=st.session_state.player_list4, value = st.session_state.player_list4[0])
+                with col53:
+                    loser_list4 = st.session_state.player_list4.copy()
+                    loser_list4.append("自摸")
+                    loser4 = st.select_slider("放铳",options=loser_list4, value = st.session_state.player_list4[0])
+                with col54:
+                    han_fu_list = ["1番30符","1番40符","1番50符","1番60符","1番70符","1番80符","1番90符","1番100符","1番110符",
+                                   "2番20符","2番25符","2番30","2番40符","2番50符","2番60符","2番70符","2番80符","2番90符","2番100符","2番110",
+                                   "3番20符","3番25符","3番30符","3番40符","3番50符","3番60符","4番20符","4番25符","4番30符","满贯","跳满","倍满",
+                                   "三倍满","累计役满","役满","双倍役满","三倍役满","四倍役满","五倍役满","六倍役满"]
+                    win_han = st.selectbox("番数/符数", options=han_fu_list)
+                with col51:
+                    han_fu_co_point = {"1番30符": (1000, 300, 500),"1番40符": (1300, 400, 700),"1番50符": (1600, 400, 800),
+                        "1番60符": (2000, 500, 1000),"1番70符": (2300, 600, 1200),"1番80符": (2600, 700, 1300),"1番90符": (2900, 800, 1500),
+                        "1番100符": (3200, 800, 1600),"1番110符": (3600, 900, 1800),"2番20符": (1300, 400, 700),"2番25符": (1600, 400, 800),
+                        "2番30": (2000, 500, 1000),"2番40符": (2600, 700, 1300),"2番50符": (3200, 800, 1600),"2番60符": (3900, 1000, 2000),
+                        "2番70符": (4500, 1200, 2300),"2番80符": (5200, 1300, 2600),"2番90符": (5800, 1500, 2900),"2番100符": (6400, 1600, 3200),
+                        "2番110": (7100, 1800, 3600),"3番20符": (2600, 700, 1300),"3番25符": (3200, 800, 1600),"3番30符": (3900, 1000, 2000),
+                        "3番40符": (5200, 1300, 2600),"3番50符": (6400, 1600, 3200),"3番60符": (7700, 2000, 3900),"4番20符": (5200, 1300, 2600),
+                        "4番25符": (6400, 1600, 3200),"4番30符": (7700, 2000, 3900),"满贯": (8000,2000,4000), "跳满": (12000,6000,3000),
+                        "倍满": (16000, 8000, 4000), "三倍满": (24000, 12000, 6000), "累计役满": (32000, 16000, 8000), "役满": (32000, 16000, 8000),
+                        "双倍役满": (64000, 32000, 16000), "三倍役满": (96000, 48000, 24000), "四倍役满": (128000, 64000, 32000),
+                        "五倍役满": (160000, 80000, 40000), "六倍役满": (192000, 96000, 48000)}
+                    han_fu_oya_point = {
+                        "1番30符": (1500, 500, 500), "1番40符": (2000, 700, 700), "1番50符": (2400, 800, 800), "1番60符": (2900, 1000, 1000),
+                        "1番70符": (3400, 1200, 1200), "1番80符": (3900, 1300, 1300), "1番90符": (4400, 1500, 1500),
+                        "1番100符": (4800, 1600, 1600), "1番110符": (5300, 1800, 1800), "2番20符": (2000, 700, 700),
+                        "2番25符": (2400, 800, 800), "2番30": (2900, 1000, 1000), "2番40符": (3900, 1300, 1300),
+                        "2番50符": (4800, 1600, 1600), "2番60符": (5800, 2000, 2000), "2番70符": (6800, 2300, 2300),
+                        "2番80符": (7700, 2600, 2600), "2番90符": (8700, 2900, 2900), "2番100符": (9600, 3200, 3200),
+                        "2番110": (10600, 3600, 3600), "3番20符": (3900, 1300, 1300), "3番25符": (4800, 1600, 1600),
+                        "3番30符": (5800, 2000, 2000), "3番40符": (7700, 2600, 2600), "3番50符": (9600, 3200, 3200),
+                        "3番60符": (11600, 3900, 3900), "4番20符": (7700, 2600, 2600), "4番25符": (9600, 3200, 3200),
+                        "4番30符": (11600, 3900, 3900), "满贯": (12000, 4000, 4000), "跳满": (18000, 6000, 6000),
+                        "倍满": (24000, 8000, 8000), "三倍满": (36000, 12000, 12000), "累计役满": (48000, 16000, 16000),
+                        "役满": (48000, 16000, 16000), "双倍役满": (96000, 32000, 32000), "三倍役满": (144000, 48000, 48000),
+                        "四倍役满": (192000, 64000, 64000), "五倍役满": (240000, 80000, 80000), "六倍役满": (288000, 96000, 96000)}
+                    if st.button("和牌"):
+                        if winner4 != loser4:
+                            st.session_state.point_list4[st.session_state.player_list4.index(winner4)] += st.session_state.point_list4[4]
+                            st.session_state.point_list4[4] = 0
+                            if winner4 == t_zhuang:
+                                if loser4 == "自摸":
+                                    zm_loser4 = st.session_state.player_list4.copy()
+                                    zm_loser4.remove(winner4)
+                                    for player in zm_loser4:
+                                        st.session_state.point_list4[st.session_state.player_list4.index(player)] -= (han_fu_oya_point[win_han][1] + st.session_state.stick4*benchang4//3)
+                                else:
+                                    st.session_state.point_list4[st.session_state.player_list4.index(loser4)] -= (han_fu_oya_point[win_han][0] + st.session_state.stick4*benchang4)
+                                st.session_state.point_list4[st.session_state.player_list4.index(winner4)] += (han_fu_oya_point[win_han][0] + st.session_state.stick4*benchang4)
+                            elif winner4 != t_zhuang:
+                                if loser4 == "自摸":
+                                    zm_loser4 = st.session_state.player_list4.copy()
+                                    zm_loser4.remove(winner4)
+                                    for player in zm_loser4:
+                                        if player == t_zhuang:
+                                            st.session_state.point_list4[st.session_state.player_list4.index(player)] -= (han_fu_co_point[win_han][2] + st.session_state.stick4*benchang4//3)
+                                        else:
+                                            st.session_state.point_list4[st.session_state.player_list4.index(player)] -= (han_fu_co_point[win_han][1] + st.session_state.stick4*benchang4//3)
+                                else:
+                                    st.session_state.point_list4[st.session_state.player_list4.index(loser4)] -= (han_fu_co_point[win_han][0] + st.session_state.stick4*benchang4)
+                                st.session_state.point_list4[st.session_state.player_list4.index(winner4)] += (han_fu_co_point[win_han][0] + st.session_state.stick4*benchang4)
+                            st.session_state.point_history4.append(st.session_state.point_list4.copy())
+                            st.rerun()
+                        else:
+                            error_message="不能荣和自己啊"
+                col61, col62 = st.columns([2,9])
+                with col62:
+                    tin_le = st.multiselect("听牌", options=st.session_state.player_list4)
+                with col61:
+                    if st.button("荒牌流局"):
+                        for player in tin_le:
+                            if len(tin_le) != 2:
+                                st.session_state.point_list4[st.session_state.player_list4.index(player)] += st.session_state.notin4*(4-len(tin_le))
+                            else:
+                                st.session_state.point_list4[st.session_state.player_list4.index(player)] += st.session_state.notin4
+                        for player in st.session_state.player_list4:
+                            if tin_le and player not in tin_le:
+                                if len(tin_le) != 2:
+                                    st.session_state.point_list4[st.session_state.player_list4.index(player)] -= st.session_state.notin4 * (len(tin_le))
+                                else:
+                                    st.session_state.point_list4[st.session_state.player_list4.index(player)] -= st.session_state.notin4
+                        st.session_state.point_history4.append(st.session_state.point_list4.copy())
+                        st.rerun()
+                col91, col92, col93 = st.columns([2,3,3])
+                if "tz4" not in st.session_state:
+                    st.session_state.tz4 = [1, 1]
+                with col91:
+                    if st.button("投骰子"):
+                        st.session_state.tz4 = [random.randint(1, 6), random.randint(1, 6)]
+                with col92:
+                    st.markdown(f"<h2 style='text-align: center;'>[{st.session_state.tz4[0]}]</h2>",unsafe_allow_html=True)
+                with col93:
+                    st.markdown(f"<h2 style='text-align: center;'>[{st.session_state.tz4[1]}]</h2>",unsafe_allow_html=True)
+                col81, col82 = st.columns([6, 1])
+                with col81:
+                    if st.button("撤回操作"):
+                        if len(st.session_state.point_history4) > 1:
+                            st.session_state.point_history4.pop()
+                            st.session_state.point_list4 = st.session_state.point_history4[-1].copy()
+                            print(st.session_state.point_history4)
+                            print(st.session_state.point_history4[-1])
+                            st.rerun()
+                        else:
+                            error_message = "没东西可以撤回了"
+                with col82:
+                    if st.button("结束对局"):
+                        st.session_state.start4 = False
+                        st.session_state.point_history4 = []
+                        st.rerun()
+                if error_message:
+                    st.error(error_message)
+                    error_message = ""
+    with tab3m:
+        st.title("骗你的，其实我还没做")
+
