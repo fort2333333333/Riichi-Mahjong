@@ -477,9 +477,15 @@ def cal_han(cal_han_user_input, cal_double, cal_lan):
                 st_han_output += f"{chinese_number[yakuman_han[max_index]]}{["倍役满"," Yakuman"][cal_lan]}{"!" * yakuman_han[max_index]}\n"
             else:
                 print(yakuman[max_index][0][0])
-                st_han_output += f"{eng_yakuman[yakuman[max_index][0][0]]}\n"
+                if cal_lan == 0:
+                    st_han_output += f"{yakuman[max_index][0][0]}\n"
+                else:
+                    st_han_output += f"{eng_yakuman[yakuman[max_index][0][0]]}\n"
                 print(yakuman[max_index][0][1] + "!" * yakuman_han[max_index])
-                st_han_output += f"{eng_yakuman[yakuman[max_index][0][1]]}{"!" * yakuman_han[max_index]}\n"
+                if cal_lan == 0:
+                    st_han_output += f"{yakuman[max_index][0][1]}{"!" * yakuman_han[max_index]}\n"
+                else:
+                    st_han_output += f"{eng_yakuman[yakuman[max_index][0][1]]}{"!" * yakuman_han[max_index]}\n"
             st.text(st_han_output)
             st_han_output = ""
             print(f"庄家：{48000 * yakuman_han[max_index]}", end="")
