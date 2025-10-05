@@ -33,22 +33,25 @@ def meld_check(meld_check_meld):
         return False
 
 
-def cal_han(cal_han_user_input, cal_double):
+def cal_han(cal_han_user_input, cal_double, cal_lan):
     st_han_output = ""
-    ron_tsumo = {"0": "和", "1": "自摸"}
-    def print_total(print_total_total_tile):
+    if cal_lan == 0:
+        ron_tsumo = {"0": "和", "1": "自摸"}
+    else:
+        ron_tsumo = {"0": "Ron", "1": "Tsumo"}
+    def print_total(print_total_total_tile, print_lan):
         re_st_han_output = ""
         match print_total_total_tile[0]:
             case "M":
                 print(f"一般和牌型 {ron_tsumo[info[0]]}：{ron_tsumo_tile}")
-                re_st_han_output += f"一般和牌型 {ron_tsumo[info[0]]}：{ron_tsumo_tile}\n"
+                re_st_han_output += f"{["一般和牌型","Standard Winning Hand"][print_lan]}  {ron_tsumo[info[0]]}：{ron_tsumo_tile}\n"
                 print("手牌：", end="")
-                re_st_han_output += "手牌："
+                re_st_han_output += f"{["手牌：","Hand："][print_lan]}"
                 for print_total_meld in print_total_total_tile[1]:
                     print(print_total_meld, end=" ")
                     re_st_han_output += f"{print_total_meld} "
                 print("\n副露：", end="")
-                re_st_han_output += "\n副露："
+                re_st_han_output += f"\n{["副露：","Meld："][print_lan]}"
                 for print_total_meld in print_total_total_tile[2]:
                     print(print_total_meld, end=" ")
                     re_st_han_output += f"{print_total_meld} "
@@ -57,12 +60,12 @@ def cal_han(cal_han_user_input, cal_double):
                     re_st_han_output += "\n"
                 else:
                     print("(无)")
-                    re_st_han_output += "(无)\n"
+                    re_st_han_output += f"{["(无)","(None)"][print_lan]}\n"
             case "Q":
                 print(f"七对子 {ron_tsumo[info[0]]}：{ron_tsumo_tile}")
-                re_st_han_output += f"七对子 {ron_tsumo[info[0]]}：{ron_tsumo_tile}\n"
+                re_st_han_output += f"{["七对子","Chiitoitsu Hand"][print_lan]}  {ron_tsumo[info[0]]}：{ron_tsumo_tile}\n"
                 print("手牌：", end="")
-                re_st_han_output += "手牌："
+                re_st_han_output += f"{["手牌：","Hand："][print_lan]}"
                 for print_total_meld in print_total_total_tile[1]:
                     print(print_total_meld, end=" ")
                     re_st_han_output += f"{print_total_meld} "
@@ -70,9 +73,9 @@ def cal_han(cal_han_user_input, cal_double):
                 re_st_han_output += "\n"
             case "G":
                 print(f"国士无双 {ron_tsumo[info[0]]}：{ron_tsumo_tile}")
-                re_st_han_output += f"国士无双 {ron_tsumo[info[0]]}：{ron_tsumo_tile}\n"
+                re_st_han_output += f"{["国士无双","Kokushi Muso Hand"][print_lan]}  {ron_tsumo[info[0]]}：{ron_tsumo_tile}\n"
                 print("手牌：", end="")
-                re_st_han_output += "手牌："
+                re_st_han_output += f"{["手牌：","Hand："][print_lan]}"
                 for print_total_meld in print_total_total_tile[1]:
                     re_st_han_output += f"{print_total_meld} "
                     print(print_total_meld, end=" ")
@@ -447,27 +450,40 @@ def cal_han(cal_han_user_input, cal_double):
                 yakuman[index].append(["九莲宝灯", "役满"])
                 yakuman_han[index] += 1
 
-    chinese_number = {1: "一", 2: "双", 3: "三", 4: "四", 5: "五", 6: "六", 7: "七", 8: "八", 9: "九"}
+    if cal_lan == 0:
+        chinese_number = {1: "一", 2: "双", 3: "三", 4: "四", 5: "五", 6: "六", 7: "七", 8: "八", 9: "九"}
+    else:
+        chinese_number = {1: "Single", 2: "Double", 3: "Triple", 4: "Quadruple", 5: "Quintuple", 6: "Sextuple", 7: "Septuple", 8: "Octuple", 9: "Nonuple"}
 
     if max(yakuman_han) != 0:
         max_index = yakuman_han.index(max(yakuman_han))
-        print_total(checked_total_tile[max_index])
+        print_total(checked_total_tile[max_index], cal_lan)
         if True:
+            eng_yakuman = {"国士无双": "Kokushi Muso", "国士无双十三面": "Kokushi Muso Juusanmen",
+                           "纯正九莲宝灯": "Junsei Churen Poto",
+                           "九莲宝灯": "Churen Poto", "四暗刻": "Suu Ankou", "四暗刻单骑": "Suu Ankou Tanki",
+                           "大三元": "Dai Sanjen", "小四喜": "Sho Suushi", "大四喜": "Dai Suushi",
+                           "字一色": "Tsuuiiso", "绿一色": "Ryuuiiso", "清老头": "Chinrooto",
+                           "四杠子": "Suu Kantsu", "天和": "Tenho", "地和": "Chiho", "役满": "Yakuman",
+                           "双倍役满": "Double Yakuman"}
             if len(yakuman[max_index]) > 1:
                 for yaku in yakuman[max_index]:
                     print(yaku[0] + " " + yaku[1])
-                    st_han_output += f"{yaku[0]} {yaku[1]}\n"
+                    if cal_lan == 0:
+                        st_han_output += f"{yaku[0]} {yaku[1]}\n"
+                    else:
+                        st_han_output += f"{eng_yakuman[yaku[0]]} - {eng_yakuman[yaku[1]]}\n"
                 print(chinese_number[yakuman_han[max_index]] + "倍役满" + "!" * yakuman_han[max_index])
-                st_han_output += f"{chinese_number[yakuman_han[max_index]]}倍役满{"!" * yakuman_han[max_index]}\n"
+                st_han_output += f"{chinese_number[yakuman_han[max_index]]}{["倍役满"," Yakuman"][cal_lan]}{"!" * yakuman_han[max_index]}\n"
             else:
                 print(yakuman[max_index][0][0])
-                st_han_output += f"{yakuman[max_index][0][0]}\n"
+                st_han_output += f"{eng_yakuman[yakuman[max_index][0][0]]}\n"
                 print(yakuman[max_index][0][1] + "!" * yakuman_han[max_index])
-                st_han_output += f"{yakuman[max_index][0][1]}{"!" * yakuman_han[max_index]}\n"
+                st_han_output += f"{eng_yakuman[yakuman[max_index][0][1]]}{"!" * yakuman_han[max_index]}\n"
             st.text(st_han_output)
             st_han_output = ""
             print(f"庄家：{48000 * yakuman_han[max_index]}", end="")
-            st_han_output += f"庄家：{48000 * yakuman_han[max_index]}"
+            st_han_output += f"{["庄家","Dealer"][cal_lan]}：{48000 * yakuman_han[max_index]}"
             if info[0] == "1":
                 print(f"/{48000 * yakuman_han[max_index] // 3 * 2}({48000 * yakuman_han[max_index] // 3})")
                 st_han_output += f"/{48000 * yakuman_han[max_index] // 3 * 2}({48000 * yakuman_han[max_index] // 3})\n"
@@ -475,7 +491,7 @@ def cal_han(cal_han_user_input, cal_double):
                 print()
                 st_han_output += "\n"
             print(f"子家：{32000 * yakuman_han[max_index]}", end="")
-            st_han_output += f"子家：{32000 * yakuman_han[max_index]}"
+            st_han_output += f"{["子家","Non-Dealer"][cal_lan]}：{32000 * yakuman_han[max_index]}"
             if info[0] == "1":
                 print(f"/{32000 * yakuman_han[max_index] // 2 + 32000 * yakuman_han[max_index] // 4}({32000 * yakuman_han[max_index] // 2},{32000 * yakuman_han[max_index] // 4})")
                 st_han_output += f"/{32000 * yakuman_han[max_index] // 2 + 32000 * yakuman_han[max_index] // 4}({32000 * yakuman_han[max_index] // 2},{32000 * yakuman_han[max_index] // 4})\n"
@@ -935,7 +951,7 @@ def cal_han(cal_han_user_input, cal_double):
         if head == "":
             head = f"{fu}符"
 
-        print_total(checked_total_tile[max_index])
+        print_total(checked_total_tile[max_index], cal_lan)
         for yaku in non_yakuman[max_index]:
             print(yaku[0] + " " + yaku[1])
             st_han_output += f"{yaku[0]} {yaku[1]}\n"
@@ -1002,34 +1018,51 @@ def cal_han(cal_han_user_input, cal_double):
                 st_han_output += f"{int(point_mangan[head][0])}"
         st.text(st_han_output)
 
-#cal_han("1s2s3s7z7z,5z5z5z5za.6z6z6z6za.1z1z1z1za,11103,5z5z,1z1z")
-
-tab1, tab2 = st.tabs(["点数计算机", "点数追踪"])
+lan = ["简体中文","English"].index(st.selectbox("语言/Language", ["简体中文","English"]))
+st.text(["若使用手机/平板，使用横屏获得更佳体验 OwO","If using phone/tablet, switch to landscape mode for better experience OwO"][lan])
+tab1, tab2 = st.tabs([f"{["点数计算机", "Point Calcuator"][lan]}", f"{["点数追踪", "Point Tracker"][lan]}"])
 with tab1:
-    st.title("点数计算机")
-    ipt1 = st.text_input("手牌（将和的牌放在最后）").lower()
+    st.title(f"{["点数计算机", "Point Calcuator"][lan]}")
+    ipt1 = st.text_input(f"{["手牌（和的牌填最后）", "Hand（Put the winning tile at the end）"][lan]}").lower()
     col11, col12, col13, col14 = st.columns(4)
     with col11:
-        ipt2 = st.text_input("副露1").lower()
+        ipt2 = st.text_input(f"{["副露1", "Meld1"][lan]}").lower()
     with col12:
-        ipt3 = st.text_input("副露2").lower()
+        ipt3 = st.text_input(f"{["副露2", "Meld2"][lan]}").lower()
     with col13:
-        ipt4 = st.text_input("副露3").lower()
+        ipt4 = st.text_input(f"{["副露3", "Meld3"][lan]}").lower()
     with col14:
-        ipt5 = st.text_input("副露4").lower()
-    ipt6 = st.selectbox("自摸/荣",["自摸","荣"])
-    ipt7 = st.multiselect("和牌状态",["立直","双立直","一发","枪杠","岭上开花","天和","地和","海底"])
+        ipt5 = st.text_input(f"{["副露4", "Meld4"][lan]}").lower()
+    ipt6 = st.selectbox(f"{["自摸/荣", "Tsumo/Ron"][lan]}",[["自摸","荣"],["Tsumo","Ron"]][lan])
+    if ipt6 == "Tsumo":
+        ipt6 = "自摸"
+    elif ipt6 == "Ron":
+        ipt6 = "荣"
+    ipt7 = st.multiselect(f"{["和牌状态", "Winning Conditions"][lan]}",[["立直","双立直","一发","枪杠","岭上开花","天和","地和","海底"],["Riichi", "Daburu Riichi", "Ippatsu", "Chankan", "Rinshan Kaiho", "Tenho", "Chiho", "Haitei"]][lan])
+    if lan == 1:
+        ipt7_tran = {"Riichi": "立直", "Daburu Riichi": "双立直", "Ippatsu": "一发", "Chankan": "枪杠",
+                         "Rinshan Kaiho": "岭上开花", "Tenho": "天和", "Chiho": "地和", "Haitei": "海底"}
+        ipt7_chn = []
+        for eng in ipt7:
+            ipt7_chn.append(ipt7_tran[eng])
+        ipt7 = ipt7_chn.copy()
+
     col31, col32 = st.columns(2)
     with col31:
-        ipt8 = st.text_input("宝牌指示牌（如果立直了请把里宝牌也加上）")
+        ipt8 = st.text_input(f"{["宝牌指示牌（如果立直了请把里宝牌也加上）", "Dora Indicator（If Riichi, Include Ura-Dora）"][lan]}")
     with col32:
-        ipt12 = st.slider("拔北宝牌", min_value=0, max_value=4, step=1)
+        ipt12 = st.slider(f"{["拔北宝牌", "Kita Dora"][lan]}", min_value=0, max_value=4, step=1)
     col21, col22 = st.columns(2)
     with col21:
-        ipt9 = st.selectbox("自风",["东","南","西","北"])
+        ipt9 = st.selectbox(f"{["自风", "Seat Wind"][lan]}",[["东","南","西","北"],["East","South","West","North"]][lan])
+        if lan == 1:
+            ipt910_tran = {"East": "东", "South": "南", "West": "西", "North": "北"}
+            ipt9 = ipt910_tran[ipt9]
     with col22:
-        ipt10 = st.selectbox("客风",["东","南","西","北"])
-    ipt11 = st.checkbox("国士无双十三面，纯正九莲宝灯，四暗刻单骑，大四喜是双倍役满", value=True)
+        ipt10 = st.selectbox(f"{["客风", "Prevalent Wind"][lan]}",[["东","南","西","北"],["East","South","West","North"]][lan])
+        if lan == 1:
+            ipt10 = ipt910_tran[ipt10]
+    ipt11 = st.checkbox(f"{['国士无双十三面，纯正九莲宝灯，四暗刻单骑，大四喜是双倍役满', 'Kokushi Muso Juusanmen, Junsei Churen Poto, Suu Ankou Tanki, Dai Suushi are double yakuman'][lan]}", value=True)
     try:
         cal_ipt = ""
         cal_ipt += ipt1
@@ -1099,7 +1132,7 @@ with tab1:
         cal_ipt += {"东":"1z","南":"2z","西":"3z","北":"4z"}[ipt9]
         cal_ipt += {"东":"1z","南":"2z","西":"3z","北":"4z"}[ipt10]
 
-        cal_han(cal_ipt, ipt11)
+        cal_han(cal_ipt, ipt11, lan)
     except Exception:
         pass
 
