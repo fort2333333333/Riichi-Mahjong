@@ -1042,7 +1042,7 @@ def cal_han(cal_han_user_input, cal_double, cal_lan):
 st.title("立直麻将计算器/ Riichi_Mahjong_Calculator")
 lan = ["简体中文","English"].index(st.selectbox("语言/Language", ["简体中文","English"]))
 st.text(["若使用手机/平板，使用横屏获得更佳体验 OwO","If using phone/tablet, switch to landscape mode for better experience OwO"][lan])
-tab1, tab2 = st.tabs([f"{["点数计算机", "Point Calcuator"][lan]}", f"{["点数追踪", "Point Tracker"][lan]}"])
+tab1, tab2, tab3 = st.tabs([f"{["点数计算机", "Point Calcuator"][lan]}", f"{["点数追踪", "Point Tracker"][lan]}", ["反馈","Feedback"][lan]])
 with tab1:
     st.title(f"{["点数计算机", "Point Calcuator"][lan]}")
     ipt1 = st.text_input(f"{["手牌（和的牌填最后）", "Hand（Put the winning tile at the end）"][lan]}").lower()
@@ -1395,4 +1395,7 @@ with tab2:
                     error_message = ""
     with tab3m:
         st.title(["骗你的，其实我还没做","I Haven't Done It"][lan])
-
+with tab3:
+    form_url = "https://docs.google.com/forms/d/e/1FAIpQLSe4clzw2E6KzdOirVOOGV6mSTG0S_XC9KdmKhb4QnnOwohUKg/viewform?usp=dialog"
+    st.markdown(f'<a href="{form_url}" target="_blank">{["提交反馈","Report Issues Or Give Feedback"][lan]}</a>',
+                unsafe_allow_html=True)
