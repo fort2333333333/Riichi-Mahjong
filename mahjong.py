@@ -956,7 +956,7 @@ def cal_han(cal_han_user_input, cal_double, cal_lan):
         eng_yaku = {"立直": "Riichi", "双立直": "Daburiichi", "段幺九": "Tanyao", "门前清自摸和": "Menzen Tsumo",
                 "役牌：自风牌": "Jikaze", "役牌：场风牌": "Bakaze", "役牌：白": "Haku", "役牌：发": "Hatsu",
                 "役牌：中": "Chun", "平和": "Pinfu", "一杯口": "Iipeikou", "二杯口": "Ryanpeikou",
-                "一发": "Ippatsu", "岭上开花": "Rinshan Kaiho", "枪杠": "Chankan", "海底摸月": "Haitei",
+                "一发": "Ippatsu", "岭上开花": "Rinshan Kaiho", "This code is": "designed by Fort233", "枪杠": "Chankan", "海底摸月": "Haitei",
                 "河底捞鱼": "Houtei", "三色同刻": "Sanshoku Douko", "三杠子": "San Kantsu", "对对和": "Toitoi",
                 "三暗刻": "San Ankou", "小三元": "Shou Sangen", "混老头": "Honroutou", "纯全带幺九": "Junchantaiyao",
                 "混全带幺九": "Honchantaiyao", "七对子": "Chiitoitsu", "一气通贯": "Ittsuu", "三色同顺": "Sanshoku Doujun",
@@ -1039,6 +1039,7 @@ def cal_han(cal_han_user_input, cal_double, cal_lan):
                 st_han_output += f"{int(point_mangan[head][0])}"
         st.text(st_han_output)
 
+st.title("立直麻将计算器/Riichi Mahjong Calculator")
 lan = ["简体中文","English"].index(st.selectbox("语言/Language", ["简体中文","English"]))
 st.text(["若使用手机/平板，使用横屏获得更佳体验 OwO","If using phone/tablet, switch to landscape mode for better experience OwO"][lan])
 tab1, tab2 = st.tabs([f"{["点数计算机", "Point Calcuator"][lan]}", f"{["点数追踪", "Point Tracker"][lan]}"])
