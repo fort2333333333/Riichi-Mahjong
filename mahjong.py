@@ -1096,6 +1096,12 @@ with tab1:
         ipt4 = ful_hand(st.text_input(f"{["副露3", "Meld3"][lan]}").lower().replace(" ",""))
     with col14:
         ipt5 = ful_hand(st.text_input(f"{["副露4", "Meld4"][lan]}").lower().replace(" ",""))
+    with st.expander(["如何输入手牌","How To Input Tiles"][lan]):
+        st.image("https://blog-imgs-136.fc2.com/k/o/n/konoyonohana/mahjong01.png")
+        if lan == 0:
+            st.text("多张同花色的牌可以只写一次字母，例如123m123s123p111z11m")
+        elif lan == 1:
+            st.text("Tiles with same suit can write the letter only once, for example 123m123s123p111z11m")
     ipt6 = st.selectbox(f"{["自摸/荣", "Tsumo/Ron"][lan]}",[["自摸","荣"],["Tsumo","Ron"]][lan])
     if ipt6 == "Tsumo":
         ipt6 = "自摸"
