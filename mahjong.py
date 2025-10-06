@@ -1067,7 +1067,9 @@ def ful_hand(hand_ipt):
         else:
             hand_letter_index.append("")
     for index, letter in enumerate(hand_ipt):
-        if letter not in ["m", "p", "s", "z"] and hand_ipt[index + 1] not in ["m", "p", "s", "z"]:
+        if letter == "a":
+            new_hand_ipt += letter
+        elif letter not in ["m", "p", "s", "z"] and hand_ipt[index + 1] not in ["m", "p", "s", "z"]:
             new_hand_ipt += letter
             for l_index, l_letter in enumerate(hand_letter_index):
                 if l_letter in ["m", "p", "s", "z"] and l_index > index:
