@@ -66,6 +66,13 @@ def cal_han(cal_han_user_input, cal_double, cal_lan):
                 re_st_han_output += f"{["七对子","Chiitoitsu Hand"][print_lan]}  {ron_tsumo[info[0]]}：{ron_tsumo_tile}\n"
                 print("手牌：", end="")
                 re_st_han_output += f"{["手牌：","Hand："][print_lan]}"
+                st.text(print_total_total_tile[1])
+                arranged_q = []
+                for q_type in "mpsz":
+                    for toitsu in print_total_total_tile[1]:
+                        if toitsu[-1] == q_type:
+                            arranged_q.append(toitsu)
+                print_total_total_tile[1] = arranged_q
                 for print_total_meld in print_total_total_tile[1]:
                     print(print_total_meld, end=" ")
                     re_st_han_output += f"{print_total_meld} "
@@ -76,6 +83,12 @@ def cal_han(cal_han_user_input, cal_double, cal_lan):
                 re_st_han_output += f"{["国士无双","Kokushi Muso Hand"][print_lan]}  {ron_tsumo[info[0]]}：{ron_tsumo_tile}\n"
                 print("手牌：", end="")
                 re_st_han_output += f"{["手牌：","Hand："][print_lan]}"
+                arranged_g = []
+                for g_type in "mpsz":
+                    for g_tile in print_total_total_tile[1]:
+                        if g_tile[-1] == g_type:
+                            arranged_g.append(g_tile)
+                print_total_total_tile[1] = arranged_g
                 for print_total_meld in print_total_total_tile[1]:
                     re_st_han_output += f"{print_total_meld} "
                     print(print_total_meld, end=" ")
@@ -1045,22 +1058,42 @@ def cal_han(cal_han_user_input, cal_double, cal_lan):
                 st_han_output += f"{int(point_mangan[head][0])}"
         st.text(st_han_output)
 
+def ful_hand(hand_ipt):
+    new_hand_ipt = ""
+    hand_letter_index = []
+    for letter in hand_ipt:
+        if letter in ["m", "p", "s", "z"]:
+            hand_letter_index.append(letter)
+        else:
+            hand_letter_index.append("")
+    for index, letter in enumerate(hand_ipt):
+        if letter not in ["m", "p", "s", "z"] and hand_ipt[index + 1] not in ["m", "p", "s", "z"]:
+            new_hand_ipt += letter
+            for l_index, l_letter in enumerate(hand_letter_index):
+                if l_letter in ["m", "p", "s", "z"] and l_index > index:
+                    new_hand_ipt += l_letter
+                    break
+        else:
+            new_hand_ipt += letter
+    return new_hand_ipt
+
+
 st.title("立直麻将计算器/ Riichi_Mahjong_Calculator")
 lan = ["简体中文","English"].index(st.selectbox("语言/Language", ["简体中文","English"]))
 st.text(["若使用手机/平板，使用横屏获得更佳体验 OwO","If using phone/tablet, switch to landscape mode for better experience OwO"][lan])
 tab1, tab2, tab3 = st.tabs([f"{["点数计算机", "Point Calcuator"][lan]}", f"{["点数追踪", "Point Tracker"][lan]}", ["反馈","Feedback"][lan]])
 with tab1:
     st.title(f"{["点数计算机", "Point Calcuator"][lan]}")
-    ipt1 = st.text_input(f"{["手牌（和的牌填最后）", "Hand（Put the winning tile at the end）"][lan]}").lower()
+    ipt1 = ful_hand(st.text_input(f"{["手牌（和的牌填最后）", "Hand（Put the winning tile at the end）"][lan]}").lower())
     col11, col12, col13, col14 = st.columns(4)
     with col11:
-        ipt2 = st.text_input(f"{["副露1", "Meld1"][lan]}").lower()
+        ipt2 = ful_hand(st.text_input(f"{["副露1", "Meld1"][lan]}").lower())
     with col12:
-        ipt3 = st.text_input(f"{["副露2", "Meld2"][lan]}").lower()
+        ipt3 = ful_hand(st.text_input(f"{["副露2", "Meld2"][lan]}").lower())
     with col13:
-        ipt4 = st.text_input(f"{["副露3", "Meld3"][lan]}").lower()
+        ipt4 = ful_hand(st.text_input(f"{["副露3", "Meld3"][lan]}").lower())
     with col14:
-        ipt5 = st.text_input(f"{["副露4", "Meld4"][lan]}").lower()
+        ipt5 = ful_hand(st.text_input(f"{["副露4", "Meld4"][lan]}").lower())
     ipt6 = st.selectbox(f"{["自摸/荣", "Tsumo/Ron"][lan]}",[["自摸","荣"],["Tsumo","Ron"]][lan])
     if ipt6 == "Tsumo":
         ipt6 = "自摸"
