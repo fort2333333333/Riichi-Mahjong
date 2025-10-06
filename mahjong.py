@@ -1299,7 +1299,7 @@ with tab2:
                         loser_list4.append("自摸")
                     else:
                         loser_list4.append("Tsumo")
-                    loser4 = st.select_slider("Ron Discarder",options=loser_list4, value = st.session_state.player_list4[0])
+                    loser4 = st.select_slider(["放铳","Ron Discarder"][lan],options=loser_list4, value = st.session_state.player_list4[0])
                     if loser4 == "Tsumo":
                         loser4 = "自摸"
                 with col54:
@@ -1409,7 +1409,7 @@ with tab2:
                 if "tz4" not in st.session_state:
                     st.session_state.tz4 = [1, 1]
                 with col91:
-                    if st.button("Roll Dice"):
+                    if st.button(["抛🎲","Roll 🎲"][lan]):
                         st.session_state.tz4 = [random.randint(1, 6), random.randint(1, 6)]
                 with col92:
                     st.markdown(f"<h2 style='text-align: center;'>[{st.session_state.tz4[0]}]</h2>",unsafe_allow_html=True)
