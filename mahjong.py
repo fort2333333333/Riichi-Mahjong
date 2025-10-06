@@ -1086,16 +1086,16 @@ st.text(["若使用手机/平板，使用横屏获得更佳体验 OwO","If using
 tab1, tab2, tab3 = st.tabs([f"{["点数计算机", "Point Calcuator"][lan]}", f"{["点数追踪", "Point Tracker"][lan]}", ["反馈","Feedback"][lan]])
 with tab1:
     st.title(f"{["点数计算机", "Point Calcuator"][lan]}")
-    ipt1 = ful_hand(st.text_input(f"{["手牌（和的牌填最后）", "Hand（Put the winning tile at the end）"][lan]}").lower())
+    ipt1 = ful_hand(st.text_input(f"{["手牌（和的牌填最后）", "Hand（Put the winning tile at the end）"][lan]}").lower().replace(" ",""))
     col11, col12, col13, col14 = st.columns(4)
     with col11:
-        ipt2 = ful_hand(st.text_input(f"{["副露1", "Meld1"][lan]}").lower())
+        ipt2 = ful_hand(st.text_input(f"{["副露1", "Meld1"][lan]}").lower().replace(" ",""))
     with col12:
-        ipt3 = ful_hand(st.text_input(f"{["副露2", "Meld2"][lan]}").lower())
+        ipt3 = ful_hand(st.text_input(f"{["副露2", "Meld2"][lan]}").lower().replace(" ",""))
     with col13:
-        ipt4 = ful_hand(st.text_input(f"{["副露3", "Meld3"][lan]}").lower())
+        ipt4 = ful_hand(st.text_input(f"{["副露3", "Meld3"][lan]}").lower().replace(" ",""))
     with col14:
-        ipt5 = ful_hand(st.text_input(f"{["副露4", "Meld4"][lan]}").lower())
+        ipt5 = ful_hand(st.text_input(f"{["副露4", "Meld4"][lan]}").lower().replace(" ",""))
     ipt6 = st.selectbox(f"{["自摸/荣", "Tsumo/Ron"][lan]}",[["自摸","荣"],["Tsumo","Ron"]][lan])
     if ipt6 == "Tsumo":
         ipt6 = "自摸"
