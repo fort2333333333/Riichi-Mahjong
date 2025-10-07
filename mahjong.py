@@ -66,7 +66,6 @@ def cal_han(cal_han_user_input, cal_double, cal_lan):
                 re_st_han_output += f"{["七对子","Chiitoitsu Hand"][print_lan]}  {ron_tsumo[info[0]]}：{ron_tsumo_tile}\n"
                 print("手牌：", end="")
                 re_st_han_output += f"{["手牌：","Hand："][print_lan]}"
-                st.text(print_total_total_tile[1])
                 arranged_q = []
                 for q_type in "mpsz":
                     for toitsu in print_total_total_tile[1]:
@@ -310,7 +309,7 @@ def cal_han(cal_han_user_input, cal_double, cal_lan):
 
     if not checked_total_tile:
         print("哥么这啥牌啊")
-        return True
+        raise Exception
 
     # 处理info(其他信息):
     for i in range(5 - len(info)):
@@ -471,6 +470,7 @@ def cal_han(cal_han_user_input, cal_double, cal_lan):
     if max(yakuman_han) != 0:
         max_index = yakuman_han.index(max(yakuman_han))
         print_total(checked_total_tile[max_index], cal_lan)
+        fu_cal = ["役满，无需算符", "Yakuman, No Need For Fu Calculation"][lan]
         if True:
             eng_yakuman = {"国士无双": "Kokushi Muso", "国士无双十三面": "Kokushi Muso Juusanmen",
                            "纯正九莲宝灯": "Junsei Churen Poto",
@@ -518,6 +518,8 @@ def cal_han(cal_han_user_input, cal_double, cal_lan):
                 print()
                 st_han_output += "\n"
             st.text(st_han_output)
+            with st.expander(["符数计算","Fu Calculation"][lan]):
+                st.text(fu_cal)
             return True
 
     # 计番(普通役)
@@ -830,7 +832,7 @@ def cal_han(cal_han_user_input, cal_double, cal_lan):
     if max(non_yakuman_han) == 0:
         print("哥么你这牌有役吗")
         for j in range(5):
-            st.text(["哥么你役去哪了？？？","Where Is Your Han Baby???"][cal_lan])
+            st.error(["哥么你役去哪了？？？","Where Is Your Han Baby???"][cal_lan])
         return True
     else:
         max_index = non_yakuman_han.index(max(non_yakuman_han))
@@ -863,6 +865,8 @@ def cal_han(cal_han_user_input, cal_double, cal_lan):
         head = ""
         fu = 20
 
+        if non_yakuman_han[max_index] >= 5:
+            fu_cal = ["番数≥5，无需算符","Han≥5, No Need For Fu Calculation"][lan]
         if non_yakuman_han[max_index] >= 13:
             head = "累计役满!!!!!"
         elif non_yakuman_han[max_index] >= 11:
@@ -874,10 +878,13 @@ def cal_han(cal_han_user_input, cal_double, cal_lan):
         elif non_yakuman_han[max_index] >= 5:
             head = "满贯!"
         else:  # 计符
+            fu_cal = ["番数<5，需要算符:\n","Han<5, Fu Calculation is needed:\n"][lan]
             if checked_total_tile[max_index][0] == "Q":
                 fu = 25
+                fu_cal += ["- 七对子，固定25符\n","- Chiitoitsu Is Always 25 Fu\n"][lan]
             else:
                 # 面子
+                fu_cal += ["- 一般和牌型，底符20符\n","- Standard Hand Base 20 Fu\n"][lan]
                 for meld in checked_total_tile[max_index][1][:-1]:
                     add_fu = 0
                     if meld[0:2] == meld[2:4]:
@@ -888,10 +895,22 @@ def cal_han(cal_han_user_input, cal_double, cal_lan):
                         else:
                             add_fu = 1
                     if add_fu:
+                        fu_cal += f"- {meld}："
                         if meld[0:2] in ["1m", "9m", "1s", "9s", "1p", "9p", "1z", "2z", "3z", "4z", "5z", "6z", "7z"]:
                             fu += 4 * add_fu
+                            match 4*add_fu:
+                                case 4:
+                                    fu_cal += ["幺九明刻，+4符\n","Exposed Honor Triple, + 4 Fu\n"][lan]
+                                case 8:
+                                    fu_cal += ["幺九暗刻，+8符\n", "Closed Honor Triple, + 8 Fu\n"][lan]
                         else:
                             fu += 2 * add_fu
+                            match 2 * add_fu:
+                                case 2:
+                                    fu_cal += ["非幺九明刻，+2符\n", "Exposed Simple Triple, + 2 Fu\n"][lan]
+                                case 4:
+                                    fu_cal += ["非幺九暗刻，+4符\n", "Closed Simple Triple, + 4 Fu\n"][lan]
+
 
                 for meld in checked_total_tile[max_index][2]:
                     add_fu = 0
@@ -904,19 +923,44 @@ def cal_han(cal_han_user_input, cal_double, cal_lan):
                             case 9:
                                 add_fu = 8
                     if add_fu:
+                        fu_cal += f"- {meld}: "
                         if meld[0:2] in ["1m", "9m", "1s", "9s", "1p", "9p", "1z", "2z", "3z", "4z", "5z", "6z", "7z"]:
                             fu += 4 * add_fu
+                            match 4 * add_fu:
+                                case 4:
+                                    fu_cal += ["幺九明刻，+4符\n", "Exposed Honor Triple, + 4 Fu\n"][lan]
+                                case 8:
+                                    fu_cal += ["幺九暗刻，+8符\n", "Closed Honor Triple, + 8 Fu\n"][lan]
+                                case 16:
+                                    fu_cal += ["幺九明杠，+16符\n", "Exposed Honor Kan, + 16 Fu\n"][lan]
+                                case 32:
+                                    fu_cal += ["幺九暗杠，+32符\n", "Closed Honor Kan, + 32 Fu\n"][lan]
                         else:
                             fu += 2 * add_fu
+                            match 2 * add_fu:
+                                case 2:
+                                    fu_cal += ["非幺九明刻，+2符\n", "Exposed Simple Triple, + 2 Fu\n"][lan]
+                                case 4:
+                                    fu_cal += ["非幺九暗刻，+4符\n", "Closed Simple Triple, + 4 Fu\n"][lan]
+                                case 8:
+                                    fu_cal += ["非幺九明杠，+8符\n", "Exposed Simple Kan, + 8 Fu\n"][lan]
+                                case 16:
+                                    fu_cal += ["非幺九暗杠，+16符\n", "Closed Simple Kan, + 16 Fu\n"][lan]
 
                 # 雀头
                 if wind[0] in checked_total_tile[max_index][1][-1]:
                     fu += 2
+                    fu_cal += f"- {checked_total_tile[max_index][1][-1]}："
+                    fu_cal += ["场风牌雀头，+2符\n","Round Wind Pair, + 2 Fu\n"][lan]
                 if wind[1] in checked_total_tile[max_index][1][-1]:
                     fu += 2
+                    fu_cal += f"- {checked_total_tile[max_index][1][-1]}："
+                    fu_cal += ["自风牌雀头，+2符\n","Seat Wind Pair, + 2 Fu\n"][lan]
                 if "5z" in checked_total_tile[max_index][1][-1] or "6z" in checked_total_tile[max_index][1][
                     -1] or "7z" in \
                         checked_total_tile[max_index][1][-1]:
+                    fu_cal += f"- {checked_total_tile[max_index][1][-1]}："
+                    fu_cal += ["三元牌雀头，+2符\n","Dragon Pair, + 2 Fu\n"][lan]
                     fu += 2
 
                 # 听牌
@@ -939,33 +983,53 @@ def cal_han(cal_han_user_input, cal_double, cal_lan):
                         if meld[0:2] != meld[2:4] and ron_tsumo_tile in meld:
                             if ron_tsumo_tile == meld[2:4]:
                                 ten_add_fu = True
+                                fu_cal += ["- 坎张听牌，+2符\n","- Closed Wait, + 2 Fu\n"][lan]
+                                break
                             elif meld in ["1s2s3s", "1m2m3m", "1p2p3p"]:
                                 if ron_tsumo_tile == meld[4:6]:
                                     ten_add_fu = True
+                                    fu_cal += ["- 边张听牌，+2符\n","- Edge Wait, + 2 Fu\n"][lan]
+                                    break
                             elif meld in ["7s8s9s", "7m8m9m", "7p8p9p"]:
                                 if ron_tsumo_tile == meld[0:2]:
                                     ten_add_fu = True
-                    if ron_tsumo_tile in checked_total_tile[max_index][1][-1]:
-                        ten_add_fu = True
+                                    fu_cal += ["- 边张听牌，+2符\n","- Edge Wait, + 2 Fu\n"][lan]
+                                    break
+                        if ron_tsumo_tile in checked_total_tile[max_index][1][-1]:
+                            ten_add_fu = True
+                            fu_cal += ["- 单骑听牌，+2符\n","- Single Wait, + 2 Fu\n"][lan]
+                            break
                 if ten_add_fu:
                     fu += 2
 
                 # 和牌状态
                 if info[0] == "1" and ["平和", "1番"] not in non_yakuman[max_index]:
                     fu += 2
+                    fu_cal += ["- 无平和自摸，+2符\n","- No Pinfu Tsumo, + 2 Fu\n"][lan]
                 if menzen and info[0] == "0":
                     fu += 10
+                    fu_cal += ["- 门前清荣和，+10符\n", "- Menzen Ron, + 10 Fu\n"][lan]
 
-            if not menzen and fu <= 30:
+            if not menzen and fu < 30:
+                fu_cal += [f"{fu}符，副露和牌不满30符时固定为30符：",f"{fu} Fu, Open Hand Below 30 Fu Always Round Up To 30 Fu: "][lan]
                 fu = 30
-
-            if fu != 25 and fu - fu // 10 * 10 != 0:
+            elif fu != 25 and fu - fu // 10 * 10 != 0:
+                fu_cal += \
+                [f"{fu}符，符数向上取整至{fu // 10 * 10 + 10}符：", f"{fu} Fu, Round Up To {fu // 10 * 10 + 10} Fu: "][lan]
                 fu = fu // 10 * 10 + 10
+            elif fu != 25:
+                fu_cal += [f"{fu}符，符数向上取整至{fu}符：", f"{fu} Fu, Round Up To {fu} Fu: "][lan]
+            else:
+                fu_cal += ["所以是：","Therefore: "][lan]
+
+            fu_cal += [f"{fu}符\n",f"{fu} Fu\n"][lan]
 
             if non_yakuman_han[max_index] == 3 and fu >= 70:
                 head = "满贯!"
+                fu_cal += ["3番70符及以上算作满贯","3 Han 70 Fu Or Above Is Mangan"][lan]
             elif non_yakuman_han[max_index] == 4 and fu >= 40:
                 head = "满贯!"
+                fu_cal += ["4番20符及以上算作满贯", "4 Han 40 Fu Or Above Is Mangan"][lan]
 
         if head == "":
             head = f"{fu}符"
@@ -1057,27 +1121,33 @@ def cal_han(cal_han_user_input, cal_double, cal_lan):
                 print(int(point_mangan[head][0]))
                 st_han_output += f"{int(point_mangan[head][0])}"
         st.text(st_han_output)
+        with st.expander(["符数计算", "Fu Calculation"][lan]):
+            st.text(fu_cal)
 
 def ful_hand(hand_ipt):
-    new_hand_ipt = ""
-    hand_letter_index = []
-    for letter in hand_ipt:
-        if letter in ["m", "p", "s", "z"]:
-            hand_letter_index.append(letter)
-        else:
-            hand_letter_index.append("")
-    for index, letter in enumerate(hand_ipt):
-        if letter == "a":
-            new_hand_ipt += letter
-        elif letter not in ["m", "p", "s", "z"] and hand_ipt[index + 1] not in ["m", "p", "s", "z"]:
-            new_hand_ipt += letter
-            for l_index, l_letter in enumerate(hand_letter_index):
-                if l_letter in ["m", "p", "s", "z"] and l_index > index:
-                    new_hand_ipt += l_letter
-                    break
-        else:
-            new_hand_ipt += letter
-    return new_hand_ipt
+    try:
+        new_hand_ipt = ""
+        hand_letter_index = []
+        for letter in hand_ipt:
+            if letter in ["m", "p", "s", "z"]:
+                hand_letter_index.append(letter)
+            else:
+                hand_letter_index.append("")
+        for index, letter in enumerate(hand_ipt):
+            if letter == "a":
+                new_hand_ipt += letter
+            elif letter not in ["m", "p", "s", "z"] and hand_ipt[index + 1] not in ["m", "p", "s", "z"]:
+                new_hand_ipt += letter
+                for l_index, l_letter in enumerate(hand_letter_index):
+                    if l_letter in ["m", "p", "s", "z"] and l_index > index:
+                        new_hand_ipt += l_letter
+                        break
+            else:
+                new_hand_ipt += letter
+        return new_hand_ipt
+    except Exception:
+        return ""
+
 
 
 st.title("立直麻将计算器/ Riichi_Mahjong_Calculator")
@@ -1100,8 +1170,10 @@ with tab1:
         st.image("https://blog-imgs-136.fc2.com/k/o/n/konoyonohana/mahjong01.png")
         if lan == 0:
             st.text("多张同花色的牌可以只写一次字母，例如123m123s123p111z11m")
+            st.text("在副露区填写暗杠时，在杠子后面加一个a，例如3s3s3s3sa或3333sa")
         elif lan == 1:
             st.text("Tiles with same suit can write the letter only once, for example 123m123s123p111z11m")
+            st.text("For closed kan in the meld area, add \"a\" at the end, for example 3s3s3s3sa or 3333sa")
     ipt6 = st.selectbox(f"{["自摸/荣", "Tsumo/Ron"][lan]}",[["自摸","荣"],["Tsumo","Ron"]][lan])
     if ipt6 == "Tsumo":
         ipt6 = "自摸"
@@ -1203,7 +1275,7 @@ with tab1:
 
         cal_han(cal_ipt, ipt11, lan)
     except Exception:
-        pass
+        st.error(["计算结果会自动输出，若无输出请重新检查输入 AwA","Results are generated automatically. If nothing appears, please double-check your input AwA"][lan])
 
 with tab2:
     error_message = ""
