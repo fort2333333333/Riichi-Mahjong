@@ -1275,7 +1275,7 @@ with tab1:
 
         cal_han(cal_ipt, ipt11, lan)
     except Exception:
-        st.error(["计算结果会自动输出，若无输出请重新检查输入 AwA","Results are generated automatically. If nothing appears, please double-check your input AwA"][lan])
+        st.text(["计算结果会自动输出，若无输出请重新检查输入 AwA","Results are generated automatically. If nothing appears, please double-check your input AwA"][lan])
 
 with tab2:
     error_message = ""
