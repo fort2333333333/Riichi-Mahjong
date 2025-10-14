@@ -1278,10 +1278,45 @@ with tab1:
         st.text(["计算结果会自动输出，若无输出请重新检查输入 AwA","Results are generated automatically. If nothing appears, please double-check your input AwA"][lan])
 
 with tab2:
-    error_message = ""
+    han_fu_co_point = {"1番30符": (1000, 300, 500), "1番40符": (1300, 400, 700), "1番50符": (1600, 400, 800),
+                       "1番60符": (2000, 500, 1000), "1番70符": (2300, 600, 1200), "1番80符": (2600, 700, 1300),
+                       "1番90符": (2900, 800, 1500),
+                       "1番100符": (3200, 800, 1600), "1番110符": (3600, 900, 1800), "2番20符": (1300, 400, 700),
+                       "2番25符": (1600, 400, 800),
+                       "2番30": (2000, 500, 1000), "2番40符": (2600, 700, 1300), "2番50符": (3200, 800, 1600),
+                       "2番60符": (3900, 1000, 2000),
+                       "2番70符": (4500, 1200, 2300), "2番80符": (5200, 1300, 2600), "2番90符": (5800, 1500, 2900),
+                       "2番100符": (6400, 1600, 3200),
+                       "2番110": (7100, 1800, 3600), "3番20符": (2600, 700, 1300), "3番25符": (3200, 800, 1600),
+                       "3番30符": (3900, 1000, 2000),
+                       "3番40符": (5200, 1300, 2600), "3番50符": (6400, 1600, 3200), "3番60符": (7700, 2000, 3900),
+                       "4番20符": (5200, 1300, 2600),
+                       "4番25符": (6400, 1600, 3200), "4番30符": (7700, 2000, 3900), "满贯": (8000, 2000, 4000),
+                       "跳满": (12000, 6000, 3000),
+                       "倍满": (16000, 8000, 4000), "三倍满": (24000, 12000, 6000), "累计役满": (32000, 16000, 8000),
+                       "役满": (32000, 16000, 8000),
+                       "双倍役满": (64000, 32000, 16000), "三倍役满": (96000, 48000, 24000),
+                       "四倍役满": (128000, 64000, 32000),
+                       "五倍役满": (160000, 80000, 40000), "六倍役满": (192000, 96000, 48000)}
+    han_fu_oya_point = {
+        "1番30符": (1500, 500, 500), "1番40符": (2000, 700, 700), "1番50符": (2400, 800, 800),
+        "1番60符": (2900, 1000, 1000),
+        "1番70符": (3400, 1200, 1200), "1番80符": (3900, 1300, 1300), "1番90符": (4400, 1500, 1500),
+        "1番100符": (4800, 1600, 1600), "1番110符": (5300, 1800, 1800), "2番20符": (2000, 700, 700),
+        "2番25符": (2400, 800, 800), "2番30": (2900, 1000, 1000), "2番40符": (3900, 1300, 1300),
+        "2番50符": (4800, 1600, 1600), "2番60符": (5800, 2000, 2000), "2番70符": (6800, 2300, 2300),
+        "2番80符": (7700, 2600, 2600), "2番90符": (8700, 2900, 2900), "2番100符": (9600, 3200, 3200),
+        "2番110": (10600, 3600, 3600), "3番20符": (3900, 1300, 1300), "3番25符": (4800, 1600, 1600),
+        "3番30符": (5800, 2000, 2000), "3番40符": (7700, 2600, 2600), "3番50符": (9600, 3200, 3200),
+        "3番60符": (11600, 3900, 3900), "4番20符": (7700, 2600, 2600), "4番25符": (9600, 3200, 3200),
+        "4番30符": (11600, 3900, 3900), "满贯": (12000, 4000, 4000), "跳满": (18000, 6000, 6000),
+        "倍满": (24000, 8000, 8000), "三倍满": (36000, 12000, 12000), "累计役满": (48000, 16000, 16000),
+        "役满": (48000, 16000, 16000), "双倍役满": (96000, 32000, 32000), "三倍役满": (144000, 48000, 48000),
+        "四倍役满": (192000, 64000, 64000), "五倍役满": (240000, 80000, 80000), "六倍役满": (288000, 96000, 96000)}
     st.title(f"{["点数追踪","Point Tracker"][lan]}")
     tab4m, tab3m = st.tabs([["四人麻将","三人麻将"],["4 Players","3 Players"]][lan])
     with tab4m:
+        error_message = ""
         if 'player_list4' not in st.session_state:
             st.session_state.player_list4 = []
         if "start4" not in st.session_state:
@@ -1411,31 +1446,6 @@ with tab2:
                     if lan == 1:
                         win_han = han_fu_tran[win_han]
                 with col51:
-                    han_fu_co_point = {"1番30符": (1000, 300, 500),"1番40符": (1300, 400, 700),"1番50符": (1600, 400, 800),
-                        "1番60符": (2000, 500, 1000),"1番70符": (2300, 600, 1200),"1番80符": (2600, 700, 1300),"1番90符": (2900, 800, 1500),
-                        "1番100符": (3200, 800, 1600),"1番110符": (3600, 900, 1800),"2番20符": (1300, 400, 700),"2番25符": (1600, 400, 800),
-                        "2番30": (2000, 500, 1000),"2番40符": (2600, 700, 1300),"2番50符": (3200, 800, 1600),"2番60符": (3900, 1000, 2000),
-                        "2番70符": (4500, 1200, 2300),"2番80符": (5200, 1300, 2600),"2番90符": (5800, 1500, 2900),"2番100符": (6400, 1600, 3200),
-                        "2番110": (7100, 1800, 3600),"3番20符": (2600, 700, 1300),"3番25符": (3200, 800, 1600),"3番30符": (3900, 1000, 2000),
-                        "3番40符": (5200, 1300, 2600),"3番50符": (6400, 1600, 3200),"3番60符": (7700, 2000, 3900),"4番20符": (5200, 1300, 2600),
-                        "4番25符": (6400, 1600, 3200),"4番30符": (7700, 2000, 3900),"满贯": (8000,2000,4000), "跳满": (12000,6000,3000),
-                        "倍满": (16000, 8000, 4000), "三倍满": (24000, 12000, 6000), "累计役满": (32000, 16000, 8000), "役满": (32000, 16000, 8000),
-                        "双倍役满": (64000, 32000, 16000), "三倍役满": (96000, 48000, 24000), "四倍役满": (128000, 64000, 32000),
-                        "五倍役满": (160000, 80000, 40000), "六倍役满": (192000, 96000, 48000)}
-                    han_fu_oya_point = {
-                        "1番30符": (1500, 500, 500), "1番40符": (2000, 700, 700), "1番50符": (2400, 800, 800), "1番60符": (2900, 1000, 1000),
-                        "1番70符": (3400, 1200, 1200), "1番80符": (3900, 1300, 1300), "1番90符": (4400, 1500, 1500),
-                        "1番100符": (4800, 1600, 1600), "1番110符": (5300, 1800, 1800), "2番20符": (2000, 700, 700),
-                        "2番25符": (2400, 800, 800), "2番30": (2900, 1000, 1000), "2番40符": (3900, 1300, 1300),
-                        "2番50符": (4800, 1600, 1600), "2番60符": (5800, 2000, 2000), "2番70符": (6800, 2300, 2300),
-                        "2番80符": (7700, 2600, 2600), "2番90符": (8700, 2900, 2900), "2番100符": (9600, 3200, 3200),
-                        "2番110": (10600, 3600, 3600), "3番20符": (3900, 1300, 1300), "3番25符": (4800, 1600, 1600),
-                        "3番30符": (5800, 2000, 2000), "3番40符": (7700, 2600, 2600), "3番50符": (9600, 3200, 3200),
-                        "3番60符": (11600, 3900, 3900), "4番20符": (7700, 2600, 2600), "4番25符": (9600, 3200, 3200),
-                        "4番30符": (11600, 3900, 3900), "满贯": (12000, 4000, 4000), "跳满": (18000, 6000, 6000),
-                        "倍满": (24000, 8000, 8000), "三倍满": (36000, 12000, 12000), "累计役满": (48000, 16000, 16000),
-                        "役满": (48000, 16000, 16000), "双倍役满": (96000, 32000, 32000), "三倍役满": (144000, 48000, 48000),
-                        "四倍役满": (192000, 64000, 64000), "五倍役满": (240000, 80000, 80000), "六倍役满": (288000, 96000, 96000)}
                     if st.button(["和牌","Win"][lan]):
                         if winner4 != loser4:
                             st.session_state.point_list4[st.session_state.player_list4.index(winner4)] += st.session_state.point_list4[4]
@@ -1446,9 +1456,11 @@ with tab2:
                                     zm_loser4.remove(winner4)
                                     for player in zm_loser4:
                                         st.session_state.point_list4[st.session_state.player_list4.index(player)] -= (han_fu_oya_point[win_han][1] + st.session_state.stick4*benchang4//3)
+                                    st.session_state.point_list4[st.session_state.player_list4.index(winner4)] += (
+                                            han_fu_oya_point[win_han][1] * 3 + st.session_state.stick4 * benchang4)
                                 else:
                                     st.session_state.point_list4[st.session_state.player_list4.index(loser4)] -= (han_fu_oya_point[win_han][0] + st.session_state.stick4*benchang4)
-                                st.session_state.point_list4[st.session_state.player_list4.index(winner4)] += (han_fu_oya_point[win_han][0] + st.session_state.stick4*benchang4)
+                                    st.session_state.point_list4[st.session_state.player_list4.index(winner4)] += (han_fu_oya_point[win_han][0] + st.session_state.stick4*benchang4)
                             elif winner4 != t_zhuang:
                                 if loser4 == "自摸":
                                     zm_loser4 = st.session_state.player_list4.copy()
@@ -1458,9 +1470,11 @@ with tab2:
                                             st.session_state.point_list4[st.session_state.player_list4.index(player)] -= (han_fu_co_point[win_han][2] + st.session_state.stick4*benchang4//3)
                                         else:
                                             st.session_state.point_list4[st.session_state.player_list4.index(player)] -= (han_fu_co_point[win_han][1] + st.session_state.stick4*benchang4//3)
+                                    st.session_state.point_list4[st.session_state.player_list4.index(winner4)] += (
+                                            han_fu_co_point[win_han][1] * 2 + han_fu_co_point[win_han][2] + st.session_state.stick4 * benchang4)
                                 else:
                                     st.session_state.point_list4[st.session_state.player_list4.index(loser4)] -= (han_fu_co_point[win_han][0] + st.session_state.stick4*benchang4)
-                                st.session_state.point_list4[st.session_state.player_list4.index(winner4)] += (han_fu_co_point[win_han][0] + st.session_state.stick4*benchang4)
+                                    st.session_state.point_list4[st.session_state.player_list4.index(winner4)] += (han_fu_co_point[win_han][0] + st.session_state.stick4*benchang4)
                             st.session_state.point_history4.append(st.session_state.point_list4.copy())
                             st.rerun()
                         else:
@@ -1513,7 +1527,240 @@ with tab2:
                     st.error(error_message)
                     error_message = ""
     with tab3m:
-        st.title(["骗你的，其实我还没做","I Haven't Done It"][lan])
+        error_message_3 = ""
+        if 'player_list3' not in st.session_state:
+            st.session_state.player_list3 = []
+        if "start3" not in st.session_state:
+            st.session_state.start3 = False
+        if "point_history3" not in st.session_state:
+            st.session_state.point_history3 = []
+        if st.session_state.start3 == False:
+            col351, col352 = st.columns([4, 1])
+            with col351:
+                insert_player_3 = st.chat_input(["添加玩家", "Insert Player"][lan],key="30")
+                if insert_player_3 and insert_player_3 not in st.session_state.player_list3 and len(
+                        st.session_state.player_list3) <= 3: st.session_state.player_list3.append(insert_player_3)
+            with col352:
+                if st.button(["移除玩家", "Remove Player"][lan],key="31"):
+                    try:
+                        st.session_state.player_list3.pop()
+                    except Exception:
+                        pass
+        player_col31, player_col32, player_col33 = st.columns(3)
+        with player_col31:
+            if len(st.session_state.player_list3) >= 1:
+                st.markdown(f"<h2 style='text-align: center;'>{st.session_state.player_list3[0]}</h2>",
+                            unsafe_allow_html=True)
+                if st.session_state.start3 == True:
+                    st.markdown(f"<h3 style='text-align: center;'>{st.session_state.point_list3[0]}</h3>",
+                                unsafe_allow_html=True)
+        with player_col32:
+            if len(st.session_state.player_list3) >= 2:
+                st.markdown(f"<h2 style='text-align: center;'>{st.session_state.player_list3[1]}</h2>",
+                            unsafe_allow_html=True)
+                if st.session_state.start3 == True:
+                    st.markdown(f"<h3 style='text-align: center;'>{st.session_state.point_list3[1]}</h3>",
+                                unsafe_allow_html=True)
+        with player_col33:
+            if len(st.session_state.player_list3) >= 3:
+                st.markdown(f"<h2 style='text-align: center;'>{st.session_state.player_list3[2]}</h2>",
+                            unsafe_allow_html=True)
+                if st.session_state.start3 == True:
+                    st.markdown(f"<h3 style='text-align: center;'>{st.session_state.point_list3[2]}</h3>",
+                                unsafe_allow_html=True)
+        if len(st.session_state.player_list3) == 3:
+            if st.session_state.start3 == False:
+                start_point_3 = st.number_input(["起始点数", "Starting Points"][lan], min_value=0, max_value=50000,
+                                              value=25000, key = "32")
+                stick_3 = st.number_input(["本场棒", "Honba Stick"][lan], min_value=100, max_value=500, value=300, key = "33")
+                st.session_state.stick3 = stick_3
+                notin_3 = st.number_input(["没听罚符", "Noten Penalty"][lan], min_value=500, max_value=2000, value=1000, key = "34")
+                st.session_state.notin3 = notin_3
+                if st.button(["开始对局", "Start The Game"][lan], key = "35"):
+                    st.session_state.start3 = True
+                    st.session_state.point_list3 = [start_point_3, start_point_3, start_point_3, start_point_3, 0]
+                    st.session_state.point_history3.append(st.session_state.point_list3.copy())
+                    st.rerun()
+            else:
+                st.markdown("<br>", unsafe_allow_html=True)
+                col341, col343, col344, col345 = st.columns([2, 1, 1, 1])
+                with col341:
+                    t_zhuang_3 = st.select_slider(["庄家", "Dealer"][lan], options=st.session_state.player_list3, value=st.session_state.player_list3[0], key = "36")
+                with col343:
+                    if st.button(f"{st.session_state.player_list3[0]}\n{["立直", "Riichi"][lan]}", key = "37"):
+                        st.session_state.point_list3[0] -= 1000
+                        st.session_state.point_list3[4] += 1000
+                        st.session_state.point_history3.append(st.session_state.point_list3.copy())
+                        st.rerun()
+                with col344:
+                    if st.button(f"{st.session_state.player_list3[1]}\n{["立直", "Riichi"][lan]}", key = "38"):
+                        st.session_state.point_list3[1] -= 1000
+                        st.session_state.point_list3[4] += 1000
+                        st.session_state.point_history3.append(st.session_state.point_list3.copy())
+                        st.rerun()
+                with col345:
+                    if st.button(f"{st.session_state.player_list3[2]}\n{["立直", "Riichi"][lan]}", key = "39"):
+                        st.session_state.point_list3[2] -= 1000
+                        st.session_state.point_list3[4] += 1000
+                        st.session_state.point_history3.append(st.session_state.point_list3.copy())
+                        st.rerun()
+                col371, col372 = st.columns([2, 9])
+                with col372:
+                    benchang3 = st.slider(["本场数", "Honba Count"][lan], min_value=0, max_value=15, key = "40")
+                with col371:
+                    st.text(f"{["立直棒", "Riichi"][lan]}：{st.session_state.point_list3[4]}")
+                    st.text(f"{["本场棒", "Honba Stick"][lan]}：{st.session_state.stick3 * benchang3}")
+                col351, col352, col353, col354 = st.columns([2, 3, 3, 3])
+                with col352:
+                    winner3 = st.select_slider(["和牌", "Winner"][lan], options=st.session_state.player_list3,
+                                               value=st.session_state.player_list3[0], key = "41")
+                with col353:
+                    loser_list3 = st.session_state.player_list3.copy()
+                    if lan == 0:
+                        loser_list3.append("自摸")
+                    else:
+                        loser_list3.append("Tsumo")
+                    loser3 = st.select_slider(["放铳", "Ron Discarder"][lan], options=loser_list3,
+                                              value=st.session_state.player_list3[0], key = "42")
+                    if loser3 == "Tsumo":
+                        loser3 = "自摸"
+                with col354:
+                    if lan == 0:
+                        han_fu_list = ["1番30符", "1番40符", "1番50符", "1番60符", "1番70符", "1番80符", "1番90符",
+                                       "1番100符", "1番110符",
+                                       "2番20符", "2番25符", "2番30符", "2番40符", "2番50符", "2番60符", "2番70符",
+                                       "2番80符", "2番90符", "2番100符", "2番110符",
+                                       "3番20符", "3番25符", "3番30符", "3番40符", "3番50符", "3番60符", "4番20符",
+                                       "4番25符", "4番30符", "满贯", "跳满", "倍满",
+                                       "三倍满", "累计役满", "役满", "双倍役满", "三倍役满", "四倍役满", "五倍役满",
+                                       "六倍役满"]
+                    else:
+                        han_fu_list = ["1 Han 30 Fu", "1 Han 40 Fu", "1 Han 50 Fu", "1 Han 60 Fu", "1 Han 70 Fu",
+                                       "1 Han 80 Fu", "1 Han 90 Fu", "1 Han 100 Fu", "1 Han 110 Fu",
+                                       "2 Han 20 Fu", "2 Han 25 Fu", "2 Han 30 Fu", "2 Han 40 Fu", "2 Han 50 Fu",
+                                       "2 Han 60 Fu", "2 Han 70 Fu", "2 Han 80 Fu", "2 Han 90 Fu", "2 Han 100 Fu",
+                                       "2 Han 110 Fu",
+                                       "3 Han 20 Fu", "3 Han 25 Fu", "3 Han 30 Fu", "3 Han 40 Fu", "3 Han 50 Fu",
+                                       "3 Han 60 Fu",
+                                       "4 Han 20 Fu", "4 Han 25 Fu", "4 Han 30 Fu",
+                                       "Mangan", "Haneman", "Baiman", "Sanbaiman", "Kazoe Yakuman", "Yakuman",
+                                       "Double Yakuman", "Triple Yakuman", "Quadruple Yakuman", "Quintuple Yakuman",
+                                       "Sextuple Yakuman"]
+                    han_fu_tran = {"1 Han 30 Fu": "1番30符", "1 Han 40 Fu": "1番40符", "1 Han 50 Fu": "1番50符",
+                                   "1 Han 60 Fu": "1番60符", "1 Han 70 Fu": "1番70符", "1 Han 80 Fu": "1番80符",
+                                   "1 Han 90 Fu": "1番90符", "1 Han 100 Fu": "1番100符", "1 Han 110 Fu": "1番110符",
+                                   "2 Han 20 Fu": "2番20符", "2 Han 25 Fu": "2番25符", "2 Han 30 Fu": "2番30符",
+                                   "2 Han 40 Fu": "2番40符", "2 Han 50 Fu": "2番50符", "2 Han 60 Fu": "2番60符",
+                                   "2 Han 70 Fu": "2番70符", "2 Han 80 Fu": "2番80符", "2 Han 90 Fu": "2番90符",
+                                   "2 Han 100 Fu": "2番100符", "2 Han 110 Fu": "2番110符", "3 Han 20 Fu": "3番20符",
+                                   "3 Han 25 Fu": "3番25符", "3 Han 30 Fu": "3番30符", "3 Han 40 Fu": "3番40符",
+                                   "3 Han 50 Fu": "3番50符", "3 Han 60 Fu": "3番60符", "4 Han 20 Fu": "4番20符",
+                                   "4 Han 25 Fu": "4番25符", "4 Han 30 Fu": "4番30符", "Mangan": "满贯",
+                                   "Haneman": "跳满", "Baiman": "倍满", "Sanbaiman": "三倍满",
+                                   "Kazoe Yakuman": "累计役满", "Yakuman": "役满", "Double Yakuman": "双倍役满",
+                                   "Triple Yakuman": "三倍役满", "Quadruple Yakuman": "四倍役满",
+                                   "Quintuple Yakuman": "五倍役满",
+                                   "Sextuple Yakuman": "六倍役满"}
+                    win_han3 = st.selectbox(["番数/符数", "Han/Fu"][lan], options=han_fu_list, key = "44")
+                    if lan == 1:
+                        win_han3 = han_fu_tran[win_han3]
+                with col351:
+                    if st.button(["和牌", "Win"][lan], key = "43"):
+                        if winner3 != loser3:
+                            st.session_state.point_list3[st.session_state.player_list3.index(winner3)] += \
+                            st.session_state.point_list3[4]
+                            st.session_state.point_list3[4] = 0
+                            if winner3 == t_zhuang_3:
+                                if loser3 == "自摸":
+                                    zm_loser3 = st.session_state.player_list3.copy()
+                                    zm_loser3.remove(winner3)
+                                    for player in zm_loser3:
+                                        st.session_state.point_list3[st.session_state.player_list3.index(player)] -= (
+                                                    han_fu_oya_point[win_han3][
+                                                        1] + st.session_state.stick3 * benchang3 // 3)
+                                    st.session_state.point_list3[st.session_state.player_list3.index(winner3)] += (
+                                            han_fu_oya_point[win_han3][1] * 2 + st.session_state.stick3 * benchang3)
+                                else:
+                                    st.session_state.point_list3[st.session_state.player_list3.index(loser3)] -= (
+                                                han_fu_oya_point[win_han3][0] + st.session_state.stick3 * benchang3)
+                                    st.session_state.point_list3[st.session_state.player_list3.index(winner3)] += (
+                                                han_fu_oya_point[win_han3][0] + st.session_state.stick3 * benchang3)
+                            elif winner3 != t_zhuang_3:
+                                if loser3 == "自摸":
+                                    zm_loser3 = st.session_state.player_list3.copy()
+                                    zm_loser3.remove(winner3)
+                                    for player in zm_loser3:
+                                        if player == t_zhuang_3:
+                                            st.session_state.point_list3[
+                                                st.session_state.player_list3.index(player)] -= (
+                                                        han_fu_co_point[win_han3][
+                                                            2] + st.session_state.stick3 * benchang3 // 3)
+                                        else:
+                                            st.session_state.point_list3[
+                                                st.session_state.player_list3.index(player)] -= (
+                                                        han_fu_co_point[win_han3][
+                                                            1] + st.session_state.stick3 * benchang3 // 3)
+                                    st.session_state.point_list3[st.session_state.player_list3.index(winner3)] += (
+                                            han_fu_co_point[win_han3][1] + han_fu_co_point[win_han3][2] + st.session_state.stick3 * benchang3)
+                                else:
+                                    st.session_state.point_list3[st.session_state.player_list3.index(loser3)] -= (
+                                                han_fu_co_point[win_han3][0] + st.session_state.stick3 * benchang3)
+                                    st.session_state.point_list3[st.session_state.player_list3.index(winner3)] += (
+                                                han_fu_co_point[win_han3][0] + st.session_state.stick3 * benchang3)
+                            st.session_state.point_history3.append(st.session_state.point_list3.copy())
+                            st.rerun()
+                        else:
+                            error_message_3 = ["不能荣和自己啊", "You Can't Ron Yourself!!!"][lan]
+                col361, col362 = st.columns([2, 9])
+                with col362:
+                    tin_le3 = st.multiselect(["听牌", "Tenpai"][lan], options=st.session_state.player_list3, key = "45")
+                with col361:
+                    if st.button(["荒牌流局", "Draw"][lan], key = "46"):
+                        if len(tin_le3) != 3:
+                            for player in st.session_state.player_list3:
+                                if player in tin_le3:
+                                    if len(tin_le3) == 2:
+                                        st.session_state.point_list3[st.session_state.player_list3.index(player)] += st.session_state.notin3
+                                    elif len(tin_le3) == 1:
+                                        st.session_state.point_list3[st.session_state.player_list3.index(player)] += st.session_state.notin3 * 2
+                                else:
+                                    if len(tin_le3) == 2:
+                                        st.session_state.point_list3[st.session_state.player_list3.index(player)] -= st.session_state.notin3 * 2
+                                    elif len(tin_le3) == 1:
+                                        st.session_state.point_list3[st.session_state.player_list3.index(player)] -= st.session_state.notin3
+                        st.session_state.point_history3.append(st.session_state.point_list3.copy())
+                        st.rerun()
+                col391, col392, col393 = st.columns([2, 3, 3])
+                if "tz3" not in st.session_state:
+                    st.session_state.tz3 = [1, 1]
+                with col391:
+                    if st.button(["抛🎲", "Roll 🎲"][lan], key = "49"):
+                        st.session_state.tz3 = [random.randint(1, 6), random.randint(1, 6)]
+                with col392:
+                    st.markdown(f"<h2 style='text-align: center;'>[{st.session_state.tz3[0]}]</h2>",
+                                unsafe_allow_html=True)
+                with col393:
+                    st.markdown(f"<h2 style='text-align: center;'>[{st.session_state.tz3[1]}]</h2>",
+                                unsafe_allow_html=True)
+                col381, col382 = st.columns([4, 1])
+                with col381:
+                    if st.button(["撤回操作", "Undo"][lan], key = "47"):
+                        if len(st.session_state.point_history3) > 1:
+                            st.session_state.point_history3.pop()
+                            st.session_state.point_list3 = st.session_state.point_history3[-1].copy()
+                            print(st.session_state.point_history3)
+                            print(st.session_state.point_history3[-1])
+                            st.rerun()
+                        else:
+                            error_message = ["没东西可以撤回了", "There Is Nothing To Undo!!!"][lan]
+                with col382:
+                    if st.button(["结束对局", "End The Game"][lan], key = "48"):
+                        st.session_state.start3 = False
+                        st.session_state.point_history3 = []
+                        st.rerun()
+                if error_message_3:
+                    st.error(error_message_3)
+                    error_message_3 = ""
 with tab3:
     form_url = "https://docs.google.com/forms/d/e/1FAIpQLSe4clzw2E6KzdOirVOOGV6mSTG0S_XC9KdmKhb4QnnOwohUKg/viewform?usp=dialog"
     st.markdown(f'<a href="{form_url}" target="_blank">{["提交反馈","Report Issues Or Give Feedback"][lan]}</a>',
