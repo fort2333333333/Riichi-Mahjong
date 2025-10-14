@@ -33,7 +33,7 @@ def meld_check(meld_check_meld):
         return False
 
 
-def cal_han(cal_han_user_input, cal_double, cal_lan):
+def cal_han(cal_han_user_input, cal_double, cal_lan, cal_output):
     st_han_output = ""
     if cal_lan == 0:
         ron_tsumo = {"0": "和", "1": "自摸"}
@@ -309,7 +309,10 @@ def cal_han(cal_han_user_input, cal_double, cal_lan):
 
     if not checked_total_tile:
         print("哥么这啥牌啊")
-        raise Exception
+        if cal_output:
+            raise Exception
+        else:
+            return False
 
     # 处理info(其他信息):
     for i in range(5 - len(info)):
@@ -469,7 +472,8 @@ def cal_han(cal_han_user_input, cal_double, cal_lan):
 
     if max(yakuman_han) != 0:
         max_index = yakuman_han.index(max(yakuman_han))
-        print_total(checked_total_tile[max_index], cal_lan)
+        if cal_output:
+            print_total(checked_total_tile[max_index], cal_lan)
         fu_cal = ["役满，无需算符", "Yakuman, No Need For Fu Calculation"][lan]
         if True:
             eng_yakuman = {"国士无双": "Kokushi Muso", "国士无双十三面": "Kokushi Muso Juusanmen",
@@ -499,7 +503,8 @@ def cal_han(cal_han_user_input, cal_double, cal_lan):
                     st_han_output += f"{yakuman[max_index][0][1]}{"!" * yakuman_han[max_index]}\n"
                 else:
                     st_han_output += f"{eng_yakuman[yakuman[max_index][0][1]]}{"!" * yakuman_han[max_index]}\n"
-            st.text(st_han_output)
+            if cal_output:
+                st.text(st_han_output)
             st_han_output = ""
             print(f"庄家：{48000 * yakuman_han[max_index]}", end="")
             st_han_output += f"{["庄家","Dealer"][cal_lan]}：{48000 * yakuman_han[max_index]}"
@@ -517,10 +522,15 @@ def cal_han(cal_han_user_input, cal_double, cal_lan):
             else:
                 print()
                 st_han_output += "\n"
-            st.text(st_han_output)
-            with st.expander(["符数计算","Fu Calculation"][lan]):
-                st.text(fu_cal)
-            return True
+            if cal_output:
+                st.text(st_han_output)
+                with st.expander(["符数计算", "Fu Calculation"][lan]):
+                    st.text(fu_cal)
+            if yakuman_han[max_index] == 1:
+                return_title = f"{["役满","Yakuman"][cal_lan]}"
+            else:
+                return_title = f"{chinese_number[yakuman_han[max_index]]}{["倍役满"," Yakuman"][cal_lan]}"
+            return return_title
 
     # 计番(普通役)
     non_yakuman = []
@@ -831,9 +841,11 @@ def cal_han(cal_han_user_input, cal_double, cal_lan):
 
     if max(non_yakuman_han) == 0:
         print("哥么你这牌有役吗")
-        for j in range(5):
-            st.error(["哥么你役去哪了？？？","Where Is Your Han Baby???"][cal_lan])
-        return True
+        if cal_output:
+            for j in range(5):
+                st.error(["哥么你役去哪了？？？","Where Is Your Han Baby???"][cal_lan])
+        return_title = ["无役", "No Yaku"][cal_lan]
+        return return_title
     else:
         max_index = non_yakuman_han.index(max(non_yakuman_han))
 
@@ -1034,7 +1046,8 @@ def cal_han(cal_han_user_input, cal_double, cal_lan):
         if head == "":
             head = f"{fu}符"
 
-        print_total(checked_total_tile[max_index], cal_lan)
+        if cal_output:
+            print_total(checked_total_tile[max_index], cal_lan)
 
         eng_yaku = {"立直": "Riichi", "双立直": "Daburiichi", "段幺九": "Tanyao", "门前清自摸和": "Menzen Tsumo",
                 "役牌：自风牌": "Jikaze", "役牌：场风牌": "Bakaze", "役牌：白": "Haku", "役牌：发": "Hatsu",
@@ -1061,8 +1074,20 @@ def cal_han(cal_han_user_input, cal_double, cal_lan):
                 st_han_output += f"{non_yakuman_han[max_index]} Han  {head[:-1]} Fu\n"
             else:
                 st_han_output += f"{non_yakuman_han[max_index]} Han  {eng_head[head]}\n"
-        st.text(st_han_output)
+        if cal_output:
+            st.text(st_han_output)
         st_han_output = ""
+
+        if head[-1] == "符":
+            if cal_lan == 0:
+                return_title = f"{non_yakuman_han[max_index]}番 {head}"
+            else:
+                return_title = f"{non_yakuman_han[max_index]} Han  {head[:-1]} Fu"
+        else:
+            if cal_lan == 0:
+                return_title = f"{non_yakuman_han[max_index]}番 {head.replace("!","")}"
+            else:
+                return_title = f"{non_yakuman_han[max_index]} Han  {eng_head[head].replace("!","")}"
 
         ko_point = {(1, 30): (1000, 300, 500), (1, 40): (1300, 400, 700), (1, 50): (1600, 400, 800),
                     (1, 60): (2000, 500, 1000), (1, 70): (2300, 600, 1200), (1, 80): (2600, 700, 1300),
@@ -1120,9 +1145,11 @@ def cal_han(cal_han_user_input, cal_double, cal_lan):
             else:
                 print(int(point_mangan[head][0]))
                 st_han_output += f"{int(point_mangan[head][0])}"
-        st.text(st_han_output)
-        with st.expander(["符数计算", "Fu Calculation"][lan]):
-            st.text(fu_cal)
+        if cal_output:
+            st.text(st_han_output)
+            with st.expander(["符数计算", "Fu Calculation"][lan]):
+                st.text(fu_cal)
+        return return_title
 
 def ful_hand(hand_ipt):
     try:
@@ -1153,7 +1180,7 @@ def ful_hand(hand_ipt):
 st.title("立直麻将计算器/ Riichi_Mahjong_Calculator")
 lan = ["简体中文","English"].index(st.selectbox("语言/Language", ["简体中文","English"]))
 st.text(["若使用手机/平板，使用横屏获得更佳体验 OwO","If using phone/tablet, switch to landscape mode for better experience OwO"][lan])
-tab1, tab2, tab3 = st.tabs([f"{["点数计算机", "Point Calcuator"][lan]}", f"{["点数追踪", "Point Tracker"][lan]}", ["反馈","Feedback"][lan]])
+tab1, tab2, tab4, tab5, tab3 = st.tabs([f"{["点数计算机", "Point Calculator"][lan]}", f"{["点数追踪", "Point Tracker"][lan]}", ["听牌计算机","Tenpai Calculator"][lan], ["其他功能","Other Functions"][lan], ["反馈","Feedback"][lan]])
 with tab1:
     st.title(f"{["点数计算机", "Point Calcuator"][lan]}")
     ipt1 = ful_hand(st.text_input(f"{["手牌（和的牌填最后）", "Hand（Put the winning tile at the end）"][lan]}").lower().replace(" ",""))
@@ -1273,7 +1300,9 @@ with tab1:
         cal_ipt += {"东":"1z","南":"2z","西":"3z","北":"4z"}[ipt9]
         cal_ipt += {"东":"1z","南":"2z","西":"3z","北":"4z"}[ipt10]
 
-        cal_han(cal_ipt, ipt11, lan)
+        cal_han(cal_ipt, ipt11, lan, True)
+
+        st.success(cal_han(cal_ipt, ipt11, lan, False))
     except Exception:
         st.text(["计算结果会自动输出，若无输出请重新检查输入 AwA","Results are generated automatically. If nothing appears, please double-check your input AwA"][lan])
 
@@ -1571,7 +1600,7 @@ with tab2:
         if len(st.session_state.player_list3) == 3:
             if st.session_state.start3 == False:
                 start_point_3 = st.number_input(["起始点数", "Starting Points"][lan], min_value=0, max_value=50000,
-                                              value=25000, key = "32")
+                                              value=35000, key = "32")
                 stick_3 = st.number_input(["本场棒", "Honba Stick"][lan], min_value=100, max_value=500, value=300, key = "33")
                 st.session_state.stick3 = stick_3
                 notin_3 = st.number_input(["没听罚符", "Noten Penalty"][lan], min_value=500, max_value=2000, value=1000, key = "34")
@@ -1765,3 +1794,131 @@ with tab3:
     form_url = "https://docs.google.com/forms/d/e/1FAIpQLSe4clzw2E6KzdOirVOOGV6mSTG0S_XC9KdmKhb4QnnOwohUKg/viewform?usp=dialog"
     st.markdown(f'<a href="{form_url}" target="_blank">{["提交反馈","Report Issues Or Give Feedback"][lan]}</a>',
                 unsafe_allow_html=True)
+with tab4:
+    TENPAI_ALL_TILE = ["1m","2m","3m","4m","5m","6m","7m","8m","9m",
+                    "1s","2s","3s","4s","5s","6s","7s","8s","9s",
+                    "1p","2p","3p","4p","5p","6p","7p","8p","9p",
+                    "1z","2z","3z","4z","5z","6z","7z"]
+    st.title("听牌计算机")
+    tenpai_hand = ful_hand(st.text_input("手牌",key="t3").lower().replace(" ",""))
+    tenpai_fanfu = st.checkbox("番符计算（需要输入更多信息）")
+    if tenpai_fanfu:
+        t4c1, t4c2, t4c3, t4c4 = st.columns(4)
+        with t4c1:
+            tenpai_meld1 = ful_hand(st.text_input("副露1",key="t4").lower().replace(" ",""))
+        with t4c2:
+            tenpai_meld2 = ful_hand(st.text_input("副露2",key="t5").lower().replace(" ", ""))
+        with t4c3:
+            tenpai_meld3 = ful_hand(st.text_input("副露3",key="t6").lower().replace(" ", ""))
+        with t4c4:
+            tenpai_meld4 = ful_hand(st.text_input("副露4",key="t7").lower().replace(" ", ""))
+        t4c5, t4c6 = st.columns(2)
+        with t4c5:
+            tenpai_riichi = st.selectbox("立直情况", ["没立直", "立直", "双立直"])
+            tenpai_wind1 = st.selectbox("场风", ["东", "南", "西", "北"], key="t1")
+        with t4c6:
+            tenpai_dora = st.text_input("宝牌指示牌",key="t8")
+            tenpai_wind2 = st.selectbox("自风", ["东", "南", "西", "北"], key="t2")
+        tenpai_double_yakuman = st.checkbox("国士无双十三面，纯正九莲宝灯，四暗刻单骑，大四喜是双倍役满",value=True,key="t9")
+    tenpai_ignore = st.checkbox("忽视已拿4张的听牌")
+    if st.button("计算"):
+        if tenpai_fanfu == False:
+            try:
+                if len(re.findall(r"[0-9][mpsz]", tenpai_hand)) == 1:
+                    tenpai_meld = "1s1s1s.1s1s1s.1s1s1s.1s1s1s"
+                elif len(re.findall(r"[0-9][mpsz]", tenpai_hand)) == 4:
+                    tenpai_meld = "1s1s1s.1s1s1s.1s1s1s"
+                elif len(re.findall(r"[0-9][mpsz]", tenpai_hand)) == 7:
+                    tenpai_meld = "1s1s1s.1s1s1s"
+                elif len(re.findall(r"[0-9][mpsz]", tenpai_hand)) == 10:
+                    tenpai_meld = "1s1s1s"
+                elif len(re.findall(r"[0-9][mpsz]", tenpai_hand)) == 13:
+                    tenpai_meld = ""
+                else:
+                    raise Exception
+                tenpai_count = False
+                for tile in TENPAI_ALL_TILE:
+                    tenpai_input = f"{tenpai_hand}{tile},{tenpai_meld},00000,,1z1z"
+                    if cal_han(tenpai_input,True,0,False):
+                        if re.findall(r"[0-9][mpsz]", tenpai_hand).count(tile) >= 4:
+                            if tenpai_ignore:
+                                pass
+                            else:
+                                st.error(tile+"(已拿四张)")
+                                tenpai_count = True
+                        else:
+                            st.success(tile)
+                            tenpai_count = True
+                if tenpai_count == False:
+                    st.error("没听")
+            except Exception:
+                st.error("请检查输入")
+        else:
+            tenpai_tiles_hand_meld = re.findall(r"[0-9][mpsz]", tenpai_hand)
+            tenpai_input1 = ","
+            for tenpai_meld in [tenpai_meld1, tenpai_meld2, tenpai_meld3, tenpai_meld4]:
+                if tenpai_meld:
+                    tenpai_input1 += tenpai_meld+"."
+                for tile in re.findall(r"[0-9][mpsz]", tenpai_meld):
+                    tenpai_tiles_hand_meld.append(tile)
+            while tenpai_input1[-1] == ".":
+                tenpai_input1 = tenpai_input1[:-1]
+            tenpai_input1 += ","
+            if tenpai_riichi == "没立直":
+                tenpai_input2 = "0000,"
+            elif tenpai_riichi == "立直":
+                tenpai_input2 = "1000,"
+            elif tenpai_riichi == "双立直":
+                tenpai_input2 = "2000,"
+            for tile in re.findall(r"[0-9][mpsz]", tenpai_dora):
+                tenpai_input2 += dora_list[tile]
+            tenpai_input2 += ","
+            for tenpai_wind in [tenpai_wind1, tenpai_wind2]:
+                tenpai_input2 += {"东":"1z","南":"2z","西":"3z","北":"4z"}[tenpai_wind]
+            for tile in TENPAI_ALL_TILE:
+                tenpai_st_output = f"{tile} "
+                for tenpai_tr in ["0", "1"]:
+                    tenpai_input3 = tenpai_hand + tile + tenpai_input1 + tenpai_tr + tenpai_input2
+                    tenpai_cal_han_output = cal_han(tenpai_input3,tenpai_double_yakuman,lan,False)
+                    if tenpai_cal_han_output:
+                        if tenpai_tr == "0":
+                            tenpai_st_output += f"( 荣: {tenpai_cal_han_output} / "
+                        elif tenpai_tr == "1":
+                            tenpai_st_output += f"自摸: {tenpai_cal_han_output} )"
+                if tenpai_st_output[-1] == ")":
+                    if tenpai_tiles_hand_meld.count(tile) >= 4:
+                        if tenpai_ignore:
+                            pass
+                        else:
+                            tenpai_st_output += " (已拿四张)"
+                            st.error(tenpai_st_output)
+                    else:
+                        st.success(tenpai_st_output)
+with tab5:
+    tab51, tab52 = st.tabs(["清一色算听牌","还没想好"])
+    with tab51:
+        QING_ALL_TILE = ["1s","2s","3s","4s","5s","6s","7s","8s","9s",
+                         "1s","2s","3s","4s","5s","6s","7s","8s","9s",
+                         "1s","2s","3s","4s","5s","6s","7s","8s","9s",
+                         "1s","2s","3s","4s","5s","6s","7s","8s","9s"]
+        minimum_tenpai = st.slider("最小听牌数", min_value=1, max_value=7)
+        if st.button("生成 (生成耗时可能较长请耐心等待)"):
+            while True:
+                random.shuffle(QING_ALL_TILE)
+                qing_hand = sorted(QING_ALL_TILE[0:13])
+                qing_ten = []
+                qing_ten_ignore = []
+                for tile in ["1s","2s","3s","4s","5s","6s","7s","8s","9s"]:
+                    cal_han_input_qing = f"{"".join(qing_hand)}{tile},,00000,,1z1z"
+                    if cal_han(cal_han_input_qing, True, 0, False):
+                        if qing_hand.count(tile) != 4:
+                            qing_ten.append(tile)
+                        else:
+                            qing_ten_ignore.append(tile)
+                if len(qing_ten) >= minimum_tenpai:
+                    break
+            st.title(" ".join(qing_hand))
+            with st.expander("听牌"):
+                st.text(f"听牌：{", ".join(qing_ten)}")
+                if qing_ten_ignore:
+                    st.text(f"({", ".join(qing_ten_ignore)}也是听牌但是已有四张)")
