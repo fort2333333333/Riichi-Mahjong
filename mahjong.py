@@ -1222,12 +1222,12 @@ with tab1:
         ipt12 = st.slider(f"{["拔北宝牌", "Kita Dora"][lan]}", min_value=0, max_value=4, step=1)
     col21, col22 = st.columns(2)
     with col21:
-        ipt9 = st.selectbox(f"{["自风", "Seat Wind"][lan]}",[["东","南","西","北"],["East","South","West","North"]][lan])
+        ipt9 = st.selectbox(f"{["场风", "Round Wind"][lan]}",[["东","南","西","北"],["East","South","West","North"]][lan])
         if lan == 1:
             ipt910_tran = {"East": "东", "South": "南", "West": "西", "North": "北"}
             ipt9 = ipt910_tran[ipt9]
     with col22:
-        ipt10 = st.selectbox(f"{["客风", "Prevalent Wind"][lan]}",[["东","南","西","北"],["East","South","West","North"]][lan])
+        ipt10 = st.selectbox(f"{["自风", "Seat Wind"][lan]}",[["东","南","西","北"],["East","South","West","North"]][lan])
         if lan == 1:
             ipt10 = ipt910_tran[ipt10]
     ipt11 = st.checkbox(f"{['国士无双十三面，纯正九莲宝灯，四暗刻单骑，大四喜是双倍役满', 'Kokushi Muso Juusanmen, Junsei Churen Poto, Suu Ankou Tanki, Dai Suushi are double yakuman'][lan]}", value=True)
@@ -1302,7 +1302,6 @@ with tab1:
 
         cal_han(cal_ipt, ipt11, lan, True)
 
-        st.success(cal_han(cal_ipt, ipt11, lan, False))
     except Exception:
         st.text(["计算结果会自动输出，若无输出请重新检查输入 AwA","Results are generated automatically. If nothing appears, please double-check your input AwA"][lan])
 
@@ -1799,29 +1798,35 @@ with tab4:
                     "1s","2s","3s","4s","5s","6s","7s","8s","9s",
                     "1p","2p","3p","4p","5p","6p","7p","8p","9p",
                     "1z","2z","3z","4z","5z","6z","7z"]
-    st.title("听牌计算机")
-    tenpai_hand = ful_hand(st.text_input("手牌",key="t3").lower().replace(" ",""))
-    tenpai_fanfu = st.checkbox("番符计算（需要输入更多信息）")
+    st.title(["听牌计算机","Tenpai Calculator"][lan])
+    tenpai_hand = ful_hand(st.text_input(["手牌","Hand"][lan],key="t3").lower().replace(" ",""))
+    tenpai_fanfu = st.checkbox(["番符计算（需要输入更多信息）","Han, Fu Caculation (More Information Are Needed)"][lan])
     if tenpai_fanfu:
         t4c1, t4c2, t4c3, t4c4 = st.columns(4)
         with t4c1:
-            tenpai_meld1 = ful_hand(st.text_input("副露1",key="t4").lower().replace(" ",""))
+            tenpai_meld1 = ful_hand(st.text_input(["副露1","Meld1"][lan],key="t4").lower().replace(" ",""))
         with t4c2:
-            tenpai_meld2 = ful_hand(st.text_input("副露2",key="t5").lower().replace(" ", ""))
+            tenpai_meld2 = ful_hand(st.text_input(["副露2","Meld2"][lan],key="t5").lower().replace(" ", ""))
         with t4c3:
-            tenpai_meld3 = ful_hand(st.text_input("副露3",key="t6").lower().replace(" ", ""))
+            tenpai_meld3 = ful_hand(st.text_input(["副露3","Meld3"][lan],key="t6").lower().replace(" ", ""))
         with t4c4:
-            tenpai_meld4 = ful_hand(st.text_input("副露4",key="t7").lower().replace(" ", ""))
+            tenpai_meld4 = ful_hand(st.text_input(["副露4","Meld4"][lan],key="t7").lower().replace(" ", ""))
         t4c5, t4c6 = st.columns(2)
         with t4c5:
-            tenpai_riichi = st.selectbox("立直情况", ["没立直", "立直", "双立直"])
-            tenpai_wind1 = st.selectbox("场风", ["东", "南", "西", "北"], key="t1")
+            tenpai_riichi = st.selectbox(["立直情况","Riichi"][lan], [["没立直", "立直", "双立直"],["No Riichi","Riichi","Double Riichi"]][lan])
+            if lan == 1:
+                tenpai_riichi = {"No Riichi":"没立直","Riichi":"立直","Double Riichi":"双立直"}[tenpai_riichi]
+            tenpai_wind1 = st.selectbox(["场风","Round Wind"][lan], [["东", "南", "西", "北"],["East","South","West","North"]][lan], key="t1")
+            if lan == 1:
+                tenpai_wind1 = {"East": "东", "South": "南", "West": "西", "North": "北"}[tenpai_wind1]
         with t4c6:
-            tenpai_dora = st.text_input("宝牌指示牌",key="t8")
-            tenpai_wind2 = st.selectbox("自风", ["东", "南", "西", "北"], key="t2")
-        tenpai_double_yakuman = st.checkbox("国士无双十三面，纯正九莲宝灯，四暗刻单骑，大四喜是双倍役满",value=True,key="t9")
-    tenpai_ignore = st.checkbox("忽视已拿4张的听牌")
-    if st.button("计算"):
+            tenpai_dora = st.text_input(["宝牌指示牌","Dora Indicator"][lan],key="t8")
+            tenpai_wind2 = st.selectbox(["自风","Seat Wind"][lan], [["东", "南", "西", "北"],["East","South","West","North"]][lan], key="t2")
+            if lan == 1:
+                tenpai_wind2 = {"East": "东", "South": "南", "West": "西", "North": "北"}[tenpai_wind2]
+        tenpai_double_yakuman = st.checkbox(["国士无双十三面，纯正九莲宝灯，四暗刻单骑，大四喜是双倍役满","Kokushi Muso Juusanmen, Junsei Churen Poto, Suu Ankou Tanki, Dai Suushi are double yakuman"][lan],value=True,key="t9")
+    tenpai_ignore = st.checkbox(["忽视已拿4张的听牌","Ignoring Tenpai With 4 Tiles Already Had"][lan])
+    if st.button(["计算","Calculate"][lan]):
         if tenpai_fanfu == False:
             try:
                 if len(re.findall(r"[0-9][mpsz]", tenpai_hand)) == 1:
@@ -1850,75 +1855,140 @@ with tab4:
                             st.success(tile)
                             tenpai_count = True
                 if tenpai_count == False:
-                    st.error("没听")
+                    st.error(["没听","Noten"][lan])
             except Exception:
-                st.error("请检查输入")
+                st.error(["请检查输入","Please Check Your Input"][lan])
         else:
-            tenpai_tiles_hand_meld = re.findall(r"[0-9][mpsz]", tenpai_hand)
-            tenpai_input1 = ","
-            for tenpai_meld in [tenpai_meld1, tenpai_meld2, tenpai_meld3, tenpai_meld4]:
-                if tenpai_meld:
-                    tenpai_input1 += tenpai_meld+"."
-                for tile in re.findall(r"[0-9][mpsz]", tenpai_meld):
-                    tenpai_tiles_hand_meld.append(tile)
-            while tenpai_input1[-1] == ".":
-                tenpai_input1 = tenpai_input1[:-1]
-            tenpai_input1 += ","
-            if tenpai_riichi == "没立直":
-                tenpai_input2 = "0000,"
-            elif tenpai_riichi == "立直":
-                tenpai_input2 = "1000,"
-            elif tenpai_riichi == "双立直":
-                tenpai_input2 = "2000,"
-            for tile in re.findall(r"[0-9][mpsz]", tenpai_dora):
-                tenpai_input2 += dora_list[tile]
-            tenpai_input2 += ","
-            for tenpai_wind in [tenpai_wind1, tenpai_wind2]:
-                tenpai_input2 += {"东":"1z","南":"2z","西":"3z","北":"4z"}[tenpai_wind]
-            for tile in TENPAI_ALL_TILE:
-                tenpai_st_output = f"{tile} "
-                for tenpai_tr in ["0", "1"]:
-                    tenpai_input3 = tenpai_hand + tile + tenpai_input1 + tenpai_tr + tenpai_input2
-                    tenpai_cal_han_output = cal_han(tenpai_input3,tenpai_double_yakuman,lan,False)
-                    if tenpai_cal_han_output:
-                        if tenpai_tr == "0":
-                            tenpai_st_output += f"( 荣: {tenpai_cal_han_output} / "
-                        elif tenpai_tr == "1":
-                            tenpai_st_output += f"自摸: {tenpai_cal_han_output} )"
-                if tenpai_st_output[-1] == ")":
-                    if tenpai_tiles_hand_meld.count(tile) >= 4:
-                        if tenpai_ignore:
-                            pass
+            try:
+                tenpai_check = False
+                tenpai_tiles_hand_meld = re.findall(r"[0-9][mpsz]", tenpai_hand)
+                tenpai_input1 = ","
+                for tenpai_meld in [tenpai_meld1, tenpai_meld2, tenpai_meld3, tenpai_meld4]:
+                    if tenpai_meld:
+                        tenpai_input1 += tenpai_meld + "."
+                    for tile in re.findall(r"[0-9][mpsz]", tenpai_meld):
+                        tenpai_tiles_hand_meld.append(tile)
+                while tenpai_input1[-1] == ".":
+                    tenpai_input1 = tenpai_input1[:-1]
+                tenpai_input1 += ","
+                if tenpai_riichi == "没立直":
+                    tenpai_input2 = "0000,"
+                elif tenpai_riichi == "立直":
+                    tenpai_input2 = "1000,"
+                elif tenpai_riichi == "双立直":
+                    tenpai_input2 = "2000,"
+                for tile in re.findall(r"[0-9][mpsz]", tenpai_dora):
+                    tenpai_input2 += dora_list[tile]
+                tenpai_input2 += ","
+                for tenpai_wind in [tenpai_wind1, tenpai_wind2]:
+                    tenpai_input2 += {"东": "1z", "南": "2z", "西": "3z", "北": "4z"}[tenpai_wind]
+                for tile in TENPAI_ALL_TILE:
+                    tenpai_st_output = f"{tile} "
+                    for tenpai_tr in ["0", "1"]:
+                        tenpai_input3 = tenpai_hand + tile + tenpai_input1 + tenpai_tr + tenpai_input2
+                        tenpai_cal_han_output = cal_han(tenpai_input3, tenpai_double_yakuman, lan, False)
+                        if tenpai_cal_han_output:
+                            if tenpai_tr == "0":
+                                tenpai_st_output += f"( {["荣", "Ron"][lan]}: {tenpai_cal_han_output} / "
+                            elif tenpai_tr == "1":
+                                tenpai_st_output += f"{["自摸", "Tsumo"][lan]}: {tenpai_cal_han_output} )"
+                    if tenpai_st_output[-1] == ")":
+                        if tenpai_tiles_hand_meld.count(tile) >= 4:
+                            if tenpai_ignore:
+                                pass
+                            else:
+                                tenpai_st_output += [" (已拿四张)", " (Had 4 Already)"][lan]
+                                st.error(tenpai_st_output)
+                                tenpai_check = True
                         else:
-                            tenpai_st_output += " (已拿四张)"
-                            st.error(tenpai_st_output)
-                    else:
-                        st.success(tenpai_st_output)
-with tab5:
-    tab51, tab52 = st.tabs(["清一色算听牌","还没想好"])
+                            if tenpai_st_output.count("役满") or tenpai_st_output.count("Yakuman"):
+                                st.info(tenpai_st_output)
+                            elif tenpai_st_output.count("无役") == 1 or tenpai_st_output.count("No Yaku") == 1:
+                                st.warning(tenpai_st_output)
+                            elif tenpai_st_output.count("无役") == 2 or tenpai_st_output.count("No Yaku") == 2:
+                                st.error(tenpai_st_output)
+                            else:
+                                st.success(tenpai_st_output)
+                            tenpai_check = True
+                if not tenpai_check:
+                    st.error(["没听", "Noten"][lan])
+            except Exception:
+                st.error(["请检查输入", "Please Check Your Input"][lan])
+
+with (tab5):
+    tab51, tab52 = st.tabs([["清一色听牌练习","Chinitsu Tenpai Practice"][lan],["还没想好","IDK"][lan]])
     with tab51:
         QING_ALL_TILE = ["1s","2s","3s","4s","5s","6s","7s","8s","9s",
                          "1s","2s","3s","4s","5s","6s","7s","8s","9s",
                          "1s","2s","3s","4s","5s","6s","7s","8s","9s",
                          "1s","2s","3s","4s","5s","6s","7s","8s","9s"]
-        minimum_tenpai = st.slider("最小听牌数", min_value=1, max_value=7)
-        if st.button("生成 (生成耗时可能较长请耐心等待)"):
+        minimum_tenpai = st.slider(["最小听牌数","Minimum Tenpai Number"][lan], min_value=1, max_value=7)
+        if st.button(["生成新的 (生成耗时可能较长请耐心等待)","Generate A New One (Might Take A While)"][lan]):
             while True:
                 random.shuffle(QING_ALL_TILE)
                 qing_hand = sorted(QING_ALL_TILE[0:13])
                 qing_ten = []
-                qing_ten_ignore = []
                 for tile in ["1s","2s","3s","4s","5s","6s","7s","8s","9s"]:
                     cal_han_input_qing = f"{"".join(qing_hand)}{tile},,00000,,1z1z"
                     if cal_han(cal_han_input_qing, True, 0, False):
                         if qing_hand.count(tile) != 4:
                             qing_ten.append(tile)
-                        else:
-                            qing_ten_ignore.append(tile)
                 if len(qing_ten) >= minimum_tenpai:
                     break
-            st.title(" ".join(qing_hand))
-            with st.expander("听牌"):
-                st.text(f"听牌：{", ".join(qing_ten)}")
-                if qing_ten_ignore:
-                    st.text(f"({", ".join(qing_ten_ignore)}也是听牌但是已有四张)")
+            til1, til2, til3, til4, til5, til6, til7, til8, til9, til10, til11, til12 ,til13 = st.columns(13)
+            with til1:
+                st.image(f"mahjong19s\\{qing_hand[0]}.png", width=300)
+            with til2:
+                st.image(f"mahjong19s\\{qing_hand[1]}.png", width=300)
+            with til3:
+                st.image(f"mahjong19s\\{qing_hand[2]}.png", width=300)
+            with til4:
+                st.image(f"mahjong19s\\{qing_hand[3]}.png", width=300)
+            with til5:
+                st.image(f"mahjong19s\\{qing_hand[4]}.png", width=300)
+            with til6:
+                st.image(f"mahjong19s\\{qing_hand[5]}.png", width=300)
+            with til7:
+                st.image(f"mahjong19s\\{qing_hand[6]}.png", width=300)
+            with til8:
+                st.image(f"mahjong19s\\{qing_hand[7]}.png", width=300)
+            with til9:
+                st.image(f"mahjong19s\\{qing_hand[8]}.png", width=300)
+            with til10:
+                st.image(f"mahjong19s\\{qing_hand[9]}.png", width=300)
+            with til11:
+                st.image(f"mahjong19s\\{qing_hand[10]}.png", width=300)
+            with til12:
+                st.image(f"mahjong19s\\{qing_hand[11]}.png", width=300)
+            with til13:
+                st.image(f"mahjong19s\\{qing_hand[12]}.png", width=300)
+            with st.expander(["听牌","Tenpai"][lan]):
+                st.text(["听牌：","Tenpai:"][lan])
+                ttil1, ttil2, ttil3, ttil4, ttil5, ttil6, ttil7, ttil8, ttil9 = st.columns(9)
+                with ttil1:
+                    if len(qing_ten) >= 1:
+                        st.image(f"mahjong19s\\{qing_ten[0]}.png", width=50)
+                with ttil2:
+                    if len(qing_ten) >= 2:
+                        st.image(f"mahjong19s\\{qing_ten[1]}.png", width=50)
+                with ttil3:
+                    if len(qing_ten) >= 3:
+                        st.image(f"mahjong19s\\{qing_ten[2]}.png", width=50)
+                with ttil4:
+                    if len(qing_ten) >= 4:
+                        st.image(f"mahjong19s\\{qing_ten[3]}.png", width=50)
+                with ttil5:
+                    if len(qing_ten) >= 5:
+                        st.image(f"mahjong19s\\{qing_ten[4]}.png", width=50)
+                with ttil6:
+                    if len(qing_ten) >= 6:
+                        st.image(f"mahjong19s\\{qing_ten[5]}.png", width=50)
+                with ttil7:
+                    if len(qing_ten) >= 7:
+                        st.image(f"mahjong19s\\{qing_ten[6]}.png", width=50)
+                with ttil8:
+                    if len(qing_ten) >= 8:
+                        st.image(f"mahjong19s\\{qing_ten[7]}.png", width=50)
+                with ttil9:
+                    if len(qing_ten) >= 9:
+                        st.image(f"mahjong19s\\{qing_ten[8]}.png", width=50)
