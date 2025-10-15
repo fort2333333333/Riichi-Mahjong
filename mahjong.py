@@ -1922,7 +1922,17 @@ with (tab5):
                          "1s","2s","3s","4s","5s","6s","7s","8s","9s",
                          "1s","2s","3s","4s","5s","6s","7s","8s","9s",
                          "1s","2s","3s","4s","5s","6s","7s","8s","9s"]
-        minimum_tenpai = st.slider(["最小听牌数","Minimum Tenpai Number"][lan], min_value=1, max_value=7)
+        qcol1, qcol2 = st.columns([2,1])
+        with qcol1:
+            minimum_tenpai = st.slider(["最小听牌数","Minimum Tenpai Number"][lan], min_value=1, max_value=7)
+        with qcol2:
+            qing_type = st.selectbox(["数牌类型","Type"][lan],[["饼子","索子","万字"],["Pinzu","Souzu","Manzu"]][lan],index=1)
+        if qing_type == "饼子" or qing_type == "Pinzu":
+            qing_type = "p"
+        elif qing_type == "索子" or qing_type == "Souzu":
+            qing_type = "s"
+        elif qing_type == "万字" or qing_type == "Manzu":
+            qing_type = "m"
         if st.button(["生成新的 (生成耗时可能较长请耐心等待)","Generate A New One (Might Take A While)"][lan]):
             while True:
                 random.shuffle(QING_ALL_TILE)
@@ -1937,57 +1947,57 @@ with (tab5):
                     break
             til1, til2, til3, til4, til5, til6, til7, til8, til9, til10, til11, til12 ,til13 = st.columns(13)
             with til1:
-                st.image(f"mahjong19s/{qing_hand[0]}.png", width=300)
+                st.image(f"mahjong19s/{qing_hand[0][0]}{qing_type}.png", width=300)
             with til2:
-                st.image(f"mahjong19s/{qing_hand[1]}.png", width=300)
+                st.image(f"mahjong19s/{qing_hand[1][0]}{qing_type}.png", width=300)
             with til3:
-                st.image(f"mahjong19s/{qing_hand[2]}.png", width=300)
+                st.image(f"mahjong19s/{qing_hand[2][0]}{qing_type}.png", width=300)
             with til4:
-                st.image(f"mahjong19s/{qing_hand[3]}.png", width=300)
+                st.image(f"mahjong19s/{qing_hand[3][0]}{qing_type}.png", width=300)
             with til5:
-                st.image(f"mahjong19s/{qing_hand[4]}.png", width=300)
+                st.image(f"mahjong19s/{qing_hand[4][0]}{qing_type}.png", width=300)
             with til6:
-                st.image(f"mahjong19s/{qing_hand[5]}.png", width=300)
+                st.image(f"mahjong19s/{qing_hand[5][0]}{qing_type}.png", width=300)
             with til7:
-                st.image(f"mahjong19s/{qing_hand[6]}.png", width=300)
+                st.image(f"mahjong19s/{qing_hand[6][0]}{qing_type}.png", width=300)
             with til8:
-                st.image(f"mahjong19s/{qing_hand[7]}.png", width=300)
+                st.image(f"mahjong19s/{qing_hand[7][0]}{qing_type}.png", width=300)
             with til9:
-                st.image(f"mahjong19s/{qing_hand[8]}.png", width=300)
+                st.image(f"mahjong19s/{qing_hand[8][0]}{qing_type}.png", width=300)
             with til10:
-                st.image(f"mahjong19s/{qing_hand[9]}.png", width=300)
+                st.image(f"mahjong19s/{qing_hand[9][0]}{qing_type}.png", width=300)
             with til11:
-                st.image(f"mahjong19s/{qing_hand[10]}.png", width=300)
+                st.image(f"mahjong19s/{qing_hand[10][0]}{qing_type}.png", width=300)
             with til12:
-                st.image(f"mahjong19s/{qing_hand[11]}.png", width=300)
+                st.image(f"mahjong19s/{qing_hand[11][0]}{qing_type}.png", width=300)
             with til13:
-                st.image(f"mahjong19s/{qing_hand[12]}.png", width=300)
+                st.image(f"mahjong19s/{qing_hand[12][0]}{qing_type}.png", width=300)
             with st.expander(["听牌","Tenpai"][lan]):
                 ttil1, ttil2, ttil3, ttil4, ttil5, ttil6, ttil7, ttil8, ttil9 = st.columns(9)
                 with ttil1:
                     if len(qing_ten) >= 1:
-                        st.image(f"mahjong19s/{qing_ten[0]}.png", width=50)
+                        st.image(f"mahjong19s/{qing_ten[0][0]}{qing_type}.png", width=50)
                 with ttil2:
                     if len(qing_ten) >= 2:
-                        st.image(f"mahjong19s/{qing_ten[1]}.png", width=50)
+                        st.image(f"mahjong19s/{qing_ten[1][0]}{qing_type}.png", width=50)
                 with ttil3:
                     if len(qing_ten) >= 3:
-                        st.image(f"mahjong19s/{qing_ten[2]}.png", width=50)
+                        st.image(f"mahjong19s/{qing_ten[2][0]}{qing_type}.png", width=50)
                 with ttil4:
                     if len(qing_ten) >= 4:
-                        st.image(f"mahjong19s/{qing_ten[3]}.png", width=50)
+                        st.image(f"mahjong19s/{qing_ten[3][0]}{qing_type}.png", width=50)
                 with ttil5:
                     if len(qing_ten) >= 5:
-                        st.image(f"mahjong19s/{qing_ten[4]}.png", width=50)
+                        st.image(f"mahjong19s/{qing_ten[4][0]}{qing_type}.png", width=50)
                 with ttil6:
                     if len(qing_ten) >= 6:
-                        st.image(f"mahjong19s/{qing_ten[5]}.png", width=50)
+                        st.image(f"mahjong19s/{qing_ten[5][0]}{qing_type}.png", width=50)
                 with ttil7:
                     if len(qing_ten) >= 7:
-                        st.image(f"mahjong19s/{qing_ten[6]}.png", width=50)
+                        st.image(f"mahjong19s/{qing_ten[6][0]}{qing_type}.png", width=50)
                 with ttil8:
                     if len(qing_ten) >= 8:
-                        st.image(f"mahjong19s/{qing_ten[7]}.png", width=50)
+                        st.image(f"mahjong19s/{qing_ten[7][0]}{qing_type}.png", width=50)
                 with ttil9:
                     if len(qing_ten) >= 9:
-                        st.image(f"mahjong19s/{qing_ten[8]}.png", width=50)
+                        st.image(f"mahjong19s/{qing_ten[8][0]}{qing_type}.png", width=50)
