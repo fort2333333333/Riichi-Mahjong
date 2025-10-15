@@ -1937,58 +1937,58 @@ with (tab5):
                     break
             til1, til2, til3, til4, til5, til6, til7, til8, til9, til10, til11, til12 ,til13 = st.columns(13)
             with til1:
-                st.image(f"mahjong19s\\{qing_hand[0]}.png", width=300)
+                st.image(f"mahjong19s/{qing_hand[0]}.png", width=300)
             with til2:
-                st.image(f"mahjong19s\\{qing_hand[1]}.png", width=300)
+                st.image(f"mahjong19s/{qing_hand[1]}.png", width=300)
             with til3:
-                st.image(f"mahjong19s\\{qing_hand[2]}.png", width=300)
+                st.image(f"mahjong19s/{qing_hand[2]}.png", width=300)
             with til4:
-                st.image(f"mahjong19s\\{qing_hand[3]}.png", width=300)
+                st.image(f"mahjong19s/{qing_hand[3]}.png", width=300)
             with til5:
-                st.image(f"mahjong19s\\{qing_hand[4]}.png", width=300)
+                st.image(f"mahjong19s/{qing_hand[4]}.png", width=300)
             with til6:
-                st.image(f"mahjong19s\\{qing_hand[5]}.png", width=300)
+                st.image(f"mahjong19s/{qing_hand[5]}.png", width=300)
             with til7:
-                st.image(f"mahjong19s\\{qing_hand[6]}.png", width=300)
+                st.image(f"mahjong19s/{qing_hand[6]}.png", width=300)
             with til8:
-                st.image(f"mahjong19s\\{qing_hand[7]}.png", width=300)
+                st.image(f"mahjong19s/{qing_hand[7]}.png", width=300)
             with til9:
-                st.image(f"mahjong19s\\{qing_hand[8]}.png", width=300)
+                st.image(f"mahjong19s/{qing_hand[8]}.png", width=300)
             with til10:
-                st.image(f"mahjong19s\\{qing_hand[9]}.png", width=300)
+                st.image(f"mahjong19s/{qing_hand[9]}.png", width=300)
             with til11:
-                st.image(f"mahjong19s\\{qing_hand[10]}.png", width=300)
+                st.image(f"mahjong19s/{qing_hand[10]}.png", width=300)
             with til12:
-                st.image(f"mahjong19s\\{qing_hand[11]}.png", width=300)
+                st.image(f"mahjong19s/{qing_hand[11]}.png", width=300)
             with til13:
-                st.image(f"mahjong19s\\{qing_hand[12]}.png", width=300)
+                st.image(f"mahjong19s/{qing_hand[12]}.png", width=300)
             with st.expander(["听牌","Tenpai"][lan]):
                 st.text(["听牌：","Tenpai:"][lan])
                 ttil1, ttil2, ttil3, ttil4, ttil5, ttil6, ttil7, ttil8, ttil9 = st.columns(9)
                 with ttil1:
                     if len(qing_ten) >= 1:
-                        st.image(f"mahjong19s\\{qing_ten[0]}.png", width=50)
+                        st.image(f"mahjong19s/{qing_ten[0]}.png", width=50)
                 with ttil2:
                     if len(qing_ten) >= 2:
-                        st.image(f"mahjong19s\\{qing_ten[1]}.png", width=50)
+                        st.image(f"mahjong19s/{qing_ten[1]}.png", width=50)
                 with ttil3:
                     if len(qing_ten) >= 3:
-                        st.image(f"mahjong19s\\{qing_ten[2]}.png", width=50)
+                        st.image(f"mahjong19s/{qing_ten[2]}.png", width=50)
                 with ttil4:
                     if len(qing_ten) >= 4:
-                        st.image(f"mahjong19s\\{qing_ten[3]}.png", width=50)
+                        st.image(f"mahjong19s/{qing_ten[3]}.png", width=50)
                 with ttil5:
                     if len(qing_ten) >= 5:
-                        st.image(f"mahjong19s\\{qing_ten[4]}.png", width=50)
+                        st.image(f"mahjong19s/{qing_ten[4]}.png", width=50)
                 with ttil6:
                     if len(qing_ten) >= 6:
-                        st.image(f"mahjong19s\\{qing_ten[5]}.png", width=50)
+                        st.image(f"mahjong19s/{qing_ten[5]}.png", width=50)
                 with ttil7:
                     if len(qing_ten) >= 7:
-                        st.image(f"mahjong19s\\{qing_ten[6]}.png", width=50)
+                        st.image(f"mahjong19s/{qing_ten[6]}.png", width=50)
                 with ttil8:
                     if len(qing_ten) >= 8:
-                        st.image(f"mahjong19s\\{qing_ten[7]}.png", width=50)
+                        st.image(f"mahjong19s/{qing_ten[7]}.png", width=50)
                 with ttil9:
                     if len(qing_ten) >= 9:
-                        st.image(f"mahjong19s\\{qing_ten[8]}.png", width=50)
+                        st.image(f"mahjong19s/{qing_ten[8]}.png", width=50)
