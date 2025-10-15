@@ -1963,7 +1963,6 @@ with (tab5):
             with til13:
                 st.image(f"mahjong19s/{qing_hand[12]}.png", width=300)
             with st.expander(["听牌","Tenpai"][lan]):
-                st.text(["听牌：","Tenpai:"][lan])
                 ttil1, ttil2, ttil3, ttil4, ttil5, ttil6, ttil7, ttil8, ttil9 = st.columns(9)
                 with ttil1:
                     if len(qing_ten) >= 1:
