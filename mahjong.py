@@ -105,10 +105,10 @@ def cal_han(cal_han_user_input, cal_double, cal_lan, cal_output):
     user_input = user_input.lower()
 
     # 将手牌信息拆解成hand(手牌),melded(副露),info(其他信息),dora(宝牌),wind(风向)五个变量
-    if user_input.count(",") == 4:
-        hand, melded, info, dora, wind = user_input.split(",")
-    else:
-        return True
+    #if user_input.count(",") == 4:
+    hand, melded, info, dora, wind = user_input.split(",")
+    #else:
+        #return [False,0]
     red_dora = []
 
     # 处理hand(手牌):使用list存储手牌里每张牌
@@ -312,7 +312,7 @@ def cal_han(cal_han_user_input, cal_double, cal_lan, cal_output):
         if cal_output:
             raise Exception
         else:
-            return False
+            return [False,-1]
 
     # 处理info(其他信息):
     for i in range(5 - len(info)):
@@ -530,6 +530,7 @@ def cal_han(cal_han_user_input, cal_double, cal_lan, cal_output):
                 return_title = f"{["役满","Yakuman"][cal_lan]}"
             else:
                 return_title = f"{chinese_number[yakuman_han[max_index]]}{["倍役满"," Yakuman"][cal_lan]}"
+            return_title = [return_title, yakuman_han[max_index]*100]
             return return_title
 
     # 计番(普通役)
@@ -845,6 +846,7 @@ def cal_han(cal_han_user_input, cal_double, cal_lan, cal_output):
             for j in range(5):
                 st.error(["哥么你役去哪了？？？","Where Is Your Han Baby???"][cal_lan])
         return_title = ["无役", "No Yaku"][cal_lan]
+        return_title = [return_title,0]
         return return_title
     else:
         max_index = non_yakuman_han.index(max(non_yakuman_han))
@@ -1149,6 +1151,7 @@ def cal_han(cal_han_user_input, cal_double, cal_lan, cal_output):
             st.text(st_han_output)
             with st.expander(["符数计算", "Fu Calculation"][lan]):
                 st.text(fu_cal)
+        return_title = [return_title, non_yakuman_han[max_index]]
         return return_title
 
 def ful_hand(hand_ipt):
@@ -1180,7 +1183,7 @@ def ful_hand(hand_ipt):
 st.title("立直麻将计算器/ Riichi_Mahjong_Calculator")
 lan = ["简体中文","English"].index(st.selectbox("语言/Language", ["简体中文","English"]))
 st.text(["若使用手机/平板，使用横屏获得更佳体验 OwO","If using phone/tablet, switch to landscape mode for better experience OwO"][lan])
-tab1, tab2, tab4, tab5, tab3 = st.tabs([f"{["点数计算机", "Point Calculator"][lan]}", f"{["点数追踪", "Point Tracker"][lan]}", ["听牌计算机","Tenpai Calculator"][lan], ["其他功能","Other Functions"][lan], ["反馈","Feedback"][lan]])
+tab1, tab2, tab4, tab5, tab3 = st.tabs([f"{["点数计算机", "Point Calculator"][lan]}", f"{["点数追踪", "Point Tracker"][lan]}", ["听牌计算机","Tenpai Calculator"][lan], ["清一色听牌练习","Chinitsu Tenpai Practice"][lan], ["反馈","Feedback"][lan]])
 with tab1:
     st.title(f"{["点数计算机", "Point Calcuator"][lan]}")
     ipt1 = ful_hand(st.text_input(f"{["手牌（和的牌填最后）", "Hand（Put the winning tile at the end）"][lan]}").lower().replace(" ",""))
@@ -1300,7 +1303,21 @@ with tab1:
         cal_ipt += {"东":"1z","南":"2z","西":"3z","北":"4z"}[ipt9]
         cal_ipt += {"东":"1z","南":"2z","西":"3z","北":"4z"}[ipt10]
 
-        cal_han(cal_ipt, ipt11, lan, True)
+        if "w" not in ipt1:
+            cal_han(cal_ipt, ipt11, lan, True)
+        else:
+            ALL_W_TILE = ["1m","2m","3m","4m","5m","6m","7m","8m","9m",
+                    "1s","2s","3s","4s","5s","6s","7s","8s","9s",
+                    "1p","2p","3p","4p","5p","6p","7p","8p","9p",
+                    "1z","2z","3z","4z","5z","6z","7z"]
+            cal_ipt.replace("w","")
+            w_han_list = []
+            for w_tile in ALL_W_TILE:
+                w_han_list.append(cal_han(w_tile + cal_ipt, ipt11, lan, False)[1])
+            w_max_index = w_han_list.index(max(w_han_list))
+            cal_ipt = ALL_W_TILE[w_max_index] + cal_ipt
+            st.text([f"万象牌是{ALL_W_TILE[w_max_index]}",f"Wild Card Is {ALL_W_TILE[w_max_index]}"][lan])
+            cal_han(cal_ipt, ipt11, lan, True)
 
     except Exception:
         st.text(["计算结果会自动输出，若无输出请重新检查输入 AwA","Results are generated automatically. If nothing appears, please double-check your input AwA"][lan])
@@ -1844,7 +1861,7 @@ with tab4:
                 tenpai_count = False
                 for tile in TENPAI_ALL_TILE:
                     tenpai_input = f"{tenpai_hand}{tile},{tenpai_meld},00000,,1z1z"
-                    if cal_han(tenpai_input,True,0,False):
+                    if cal_han(tenpai_input,True,0,False)[0]:
                         if re.findall(r"[0-9][mpsz]", tenpai_hand).count(tile) >= 4:
                             if tenpai_ignore:
                                 pass
@@ -1886,7 +1903,7 @@ with tab4:
                     tenpai_st_output = f"{tile} "
                     for tenpai_tr in ["0", "1"]:
                         tenpai_input3 = tenpai_hand + tile + tenpai_input1 + tenpai_tr + tenpai_input2
-                        tenpai_cal_han_output = cal_han(tenpai_input3, tenpai_double_yakuman, lan, False)
+                        tenpai_cal_han_output = cal_han(tenpai_input3, tenpai_double_yakuman, lan, False)[0]
                         if tenpai_cal_han_output:
                             if tenpai_tr == "0":
                                 tenpai_st_output += f"( {["荣", "Ron"][lan]}: {tenpai_cal_han_output} / "
@@ -1916,88 +1933,87 @@ with tab4:
                 st.error(["请检查输入", "Please Check Your Input"][lan])
 
 with (tab5):
-    tab51, tab52 = st.tabs([["清一色听牌练习","Chinitsu Tenpai Practice"][lan],["还没想好","IDK"][lan]])
-    with tab51:
-        QING_ALL_TILE = ["1s","2s","3s","4s","5s","6s","7s","8s","9s",
-                         "1s","2s","3s","4s","5s","6s","7s","8s","9s",
-                         "1s","2s","3s","4s","5s","6s","7s","8s","9s",
-                         "1s","2s","3s","4s","5s","6s","7s","8s","9s"]
-        qcol1, qcol2 = st.columns([2,1])
-        with qcol1:
-            minimum_tenpai = st.slider(["最小听牌数","Minimum Tenpai Number"][lan], min_value=1, max_value=7)
-        with qcol2:
-            qing_type = st.selectbox(["数牌类型","Type"][lan],[["饼子","索子","万字"],["Pinzu","Souzu","Manzu"]][lan],index=1)
-        if qing_type == "饼子" or qing_type == "Pinzu":
-            qing_type = "p"
-        elif qing_type == "索子" or qing_type == "Souzu":
-            qing_type = "s"
-        elif qing_type == "万字" or qing_type == "Manzu":
-            qing_type = "m"
-        if st.button(["生成新的 (生成耗时可能较长请耐心等待)","Generate A New One (Might Take A While)"][lan]):
-            while True:
-                random.shuffle(QING_ALL_TILE)
-                qing_hand = sorted(QING_ALL_TILE[0:13])
-                qing_ten = []
-                for tile in ["1s","2s","3s","4s","5s","6s","7s","8s","9s"]:
-                    cal_han_input_qing = f"{"".join(qing_hand)}{tile},,00000,,1z1z"
-                    if cal_han(cal_han_input_qing, True, 0, False):
-                        if qing_hand.count(tile) != 4:
-                            qing_ten.append(tile)
-                if len(qing_ten) >= minimum_tenpai:
-                    break
-            til1, til2, til3, til4, til5, til6, til7, til8, til9, til10, til11, til12 ,til13 = st.columns(13)
-            with til1:
-                st.image(f"mahjong19s/{qing_hand[0][0]}{qing_type}.png", width=300)
-            with til2:
-                st.image(f"mahjong19s/{qing_hand[1][0]}{qing_type}.png", width=300)
-            with til3:
-                st.image(f"mahjong19s/{qing_hand[2][0]}{qing_type}.png", width=300)
-            with til4:
-                st.image(f"mahjong19s/{qing_hand[3][0]}{qing_type}.png", width=300)
-            with til5:
-                st.image(f"mahjong19s/{qing_hand[4][0]}{qing_type}.png", width=300)
-            with til6:
-                st.image(f"mahjong19s/{qing_hand[5][0]}{qing_type}.png", width=300)
-            with til7:
-                st.image(f"mahjong19s/{qing_hand[6][0]}{qing_type}.png", width=300)
-            with til8:
-                st.image(f"mahjong19s/{qing_hand[7][0]}{qing_type}.png", width=300)
-            with til9:
-                st.image(f"mahjong19s/{qing_hand[8][0]}{qing_type}.png", width=300)
-            with til10:
-                st.image(f"mahjong19s/{qing_hand[9][0]}{qing_type}.png", width=300)
-            with til11:
-                st.image(f"mahjong19s/{qing_hand[10][0]}{qing_type}.png", width=300)
-            with til12:
-                st.image(f"mahjong19s/{qing_hand[11][0]}{qing_type}.png", width=300)
-            with til13:
-                st.image(f"mahjong19s/{qing_hand[12][0]}{qing_type}.png", width=300)
-            with st.expander(["听牌","Tenpai"][lan]):
-                ttil1, ttil2, ttil3, ttil4, ttil5, ttil6, ttil7, ttil8, ttil9 = st.columns(9)
-                with ttil1:
-                    if len(qing_ten) >= 1:
-                        st.image(f"mahjong19s/{qing_ten[0][0]}{qing_type}.png", width=50)
-                with ttil2:
-                    if len(qing_ten) >= 2:
-                        st.image(f"mahjong19s/{qing_ten[1][0]}{qing_type}.png", width=50)
-                with ttil3:
-                    if len(qing_ten) >= 3:
-                        st.image(f"mahjong19s/{qing_ten[2][0]}{qing_type}.png", width=50)
-                with ttil4:
-                    if len(qing_ten) >= 4:
-                        st.image(f"mahjong19s/{qing_ten[3][0]}{qing_type}.png", width=50)
-                with ttil5:
-                    if len(qing_ten) >= 5:
-                        st.image(f"mahjong19s/{qing_ten[4][0]}{qing_type}.png", width=50)
-                with ttil6:
-                    if len(qing_ten) >= 6:
-                        st.image(f"mahjong19s/{qing_ten[5][0]}{qing_type}.png", width=50)
-                with ttil7:
-                    if len(qing_ten) >= 7:
-                        st.image(f"mahjong19s/{qing_ten[6][0]}{qing_type}.png", width=50)
-                with ttil8:
-                    if len(qing_ten) >= 8:
-                        st.image(f"mahjong19s/{qing_ten[7][0]}{qing_type}.png", width=50)
-                with ttil9:
-                    if len(qing_ten) >= 9:
-                        st.image(f"mahjong19s/{qing_ten[8][0]}{qing_type}.png", width=50)
+    QING_ALL_TILE = ["1s", "2s", "3s", "4s", "5s", "6s", "7s", "8s", "9s",
+                     "1s", "2s", "3s", "4s", "5s", "6s", "7s", "8s", "9s",
+                     "1s", "2s", "3s", "4s", "5s", "6s", "7s", "8s", "9s",
+                     "1s", "2s", "3s", "4s", "5s", "6s", "7s", "8s", "9s"]
+    qcol1, qcol2 = st.columns([2, 1])
+    with qcol1:
+        minimum_tenpai = st.slider(["最小听牌数", "Minimum Tenpai Number"][lan], min_value=1, max_value=7)
+    with qcol2:
+        qing_type = st.selectbox(["数牌类型", "Type"][lan],
+                                 [["饼子", "索子", "万字"], ["Pinzu", "Souzu", "Manzu"]][lan], index=1)
+    if qing_type == "饼子" or qing_type == "Pinzu":
+        qing_type = "p"
+    elif qing_type == "索子" or qing_type == "Souzu":
+        qing_type = "s"
+    elif qing_type == "万字" or qing_type == "Manzu":
+        qing_type = "m"
+    if st.button(["生成新的 (生成耗时可能较长请耐心等待)", "Generate A New One (Might Take A While)"][lan]):
+        while True:
+            random.shuffle(QING_ALL_TILE)
+            qing_hand = sorted(QING_ALL_TILE[0:13])
+            qing_ten = []
+            for tile in ["1s", "2s", "3s", "4s", "5s", "6s", "7s", "8s", "9s"]:
+                cal_han_input_qing = f"{"".join(qing_hand)}{tile},,00000,,1z1z"
+                if cal_han(cal_han_input_qing, True, 0, False)[0]:
+                    if qing_hand.count(tile) != 4:
+                        qing_ten.append(tile)
+            if len(qing_ten) >= minimum_tenpai:
+                break
+        til1, til2, til3, til4, til5, til6, til7, til8, til9, til10, til11, til12, til13 = st.columns(13)
+        with til1:
+            st.image(f"mahjong19s/{qing_hand[0][0]}{qing_type}.png", width=300)
+        with til2:
+            st.image(f"mahjong19s/{qing_hand[1][0]}{qing_type}.png", width=300)
+        with til3:
+            st.image(f"mahjong19s/{qing_hand[2][0]}{qing_type}.png", width=300)
+        with til4:
+            st.image(f"mahjong19s/{qing_hand[3][0]}{qing_type}.png", width=300)
+        with til5:
+            st.image(f"mahjong19s/{qing_hand[4][0]}{qing_type}.png", width=300)
+        with til6:
+            st.image(f"mahjong19s/{qing_hand[5][0]}{qing_type}.png", width=300)
+        with til7:
+            st.image(f"mahjong19s/{qing_hand[6][0]}{qing_type}.png", width=300)
+        with til8:
+            st.image(f"mahjong19s/{qing_hand[7][0]}{qing_type}.png", width=300)
+        with til9:
+            st.image(f"mahjong19s/{qing_hand[8][0]}{qing_type}.png", width=300)
+        with til10:
+            st.image(f"mahjong19s/{qing_hand[9][0]}{qing_type}.png", width=300)
+        with til11:
+            st.image(f"mahjong19s/{qing_hand[10][0]}{qing_type}.png", width=300)
+        with til12:
+            st.image(f"mahjong19s/{qing_hand[11][0]}{qing_type}.png", width=300)
+        with til13:
+            st.image(f"mahjong19s/{qing_hand[12][0]}{qing_type}.png", width=300)
+        with st.expander(["听牌", "Tenpai"][lan]):
+            ttil1, ttil2, ttil3, ttil4, ttil5, ttil6, ttil7, ttil8, ttil9 = st.columns(9)
+            with ttil1:
+                if len(qing_ten) >= 1:
+                    st.image(f"mahjong19s/{qing_ten[0][0]}{qing_type}.png", width=50)
+            with ttil2:
+                if len(qing_ten) >= 2:
+                    st.image(f"mahjong19s/{qing_ten[1][0]}{qing_type}.png", width=50)
+            with ttil3:
+                if len(qing_ten) >= 3:
+                    st.image(f"mahjong19s/{qing_ten[2][0]}{qing_type}.png", width=50)
+            with ttil4:
+                if len(qing_ten) >= 4:
+                    st.image(f"mahjong19s/{qing_ten[3][0]}{qing_type}.png", width=50)
+            with ttil5:
+                if len(qing_ten) >= 5:
+                    st.image(f"mahjong19s/{qing_ten[4][0]}{qing_type}.png", width=50)
+            with ttil6:
+                if len(qing_ten) >= 6:
+                    st.image(f"mahjong19s/{qing_ten[5][0]}{qing_type}.png", width=50)
+            with ttil7:
+                if len(qing_ten) >= 7:
+                    st.image(f"mahjong19s/{qing_ten[6][0]}{qing_type}.png", width=50)
+            with ttil8:
+                if len(qing_ten) >= 8:
+                    st.image(f"mahjong19s/{qing_ten[7][0]}{qing_type}.png", width=50)
+            with ttil9:
+                if len(qing_ten) >= 9:
+                    st.image(f"mahjong19s/{qing_ten[8][0]}{qing_type}.png", width=50)
