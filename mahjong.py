@@ -1164,7 +1164,7 @@ def ful_hand(hand_ipt):
             else:
                 hand_letter_index.append("")
         for index, letter in enumerate(hand_ipt):
-            if letter == "a":
+            if letter == "a" or letter == "w":
                 new_hand_ipt += letter
             elif letter not in ["m", "p", "s", "z"] and hand_ipt[index + 1] not in ["m", "p", "s", "z"]:
                 new_hand_ipt += letter
@@ -1844,40 +1844,90 @@ with tab4:
                 tenpai_wind2 = {"East": "东", "South": "南", "West": "西", "North": "北"}[tenpai_wind2]
         tenpai_double_yakuman = st.checkbox(["国士无双十三面，纯正九莲宝灯，四暗刻单骑，大四喜是双倍役满","Kokushi Muso Juusanmen, Junsei Churen Poto, Suu Ankou Tanki, Dai Suushi are double yakuman"][lan],value=True,key="t9")
     tenpai_ignore = st.checkbox(["忽视已拿4张的听牌","Ignoring Tenpai With 4 Tiles Already Had"][lan])
+
+    def w_cal_han(w_cal_ipt,w_ipt11,fast):
+        ALL_WW_TILE = ["1m", "2m", "3m", "4m", "5m", "6m", "7m", "8m", "9m",
+                      "1s", "2s", "3s", "4s", "5s", "6s", "7s", "8s", "9s",
+                      "1p", "2p", "3p", "4p", "5p", "6p", "7p", "8p", "9p",
+                      "1z", "2z", "3z", "4z", "5z", "6z", "7z"]
+        w_cal_ipt.replace("w", "")
+        w_w_han_list = []
+        for w_tile in ALL_WW_TILE:
+            w_cal_han_result = cal_han(w_tile + w_cal_ipt, w_ipt11, lan, False)[1]
+            w_w_han_list.append(w_cal_han_result)
+            if fast and w_cal_han_result != -1:
+               return [True,1]
+        w_max_index = w_w_han_list.index(max(w_w_han_list))
+        w_cal_ipt = ALL_WW_TILE[w_max_index] + w_cal_ipt
+        if max(w_w_han_list) != -1:
+            return cal_han(w_cal_ipt, w_ipt11, lan, False)
+        else:
+            return [False, -1]
     if st.button(["计算","Calculate"][lan]):
         if tenpai_fanfu == False:
             try:
-                if len(re.findall(r"[0-9][mpsz]", tenpai_hand)) == 1:
-                    tenpai_meld = "1s1s1s.1s1s1s.1s1s1s.1s1s1s"
-                elif len(re.findall(r"[0-9][mpsz]", tenpai_hand)) == 4:
-                    tenpai_meld = "1s1s1s.1s1s1s.1s1s1s"
-                elif len(re.findall(r"[0-9][mpsz]", tenpai_hand)) == 7:
-                    tenpai_meld = "1s1s1s.1s1s1s"
-                elif len(re.findall(r"[0-9][mpsz]", tenpai_hand)) == 10:
-                    tenpai_meld = "1s1s1s"
-                elif len(re.findall(r"[0-9][mpsz]", tenpai_hand)) == 13:
-                    tenpai_meld = ""
-                else:
-                    raise Exception
-                tenpai_count = False
-                for tile in TENPAI_ALL_TILE:
-                    tenpai_input = f"{tenpai_hand}{tile},{tenpai_meld},00000,,1z1z"
-                    if cal_han(tenpai_input,True,0,False)[0]:
-                        if re.findall(r"[0-9][mpsz]", tenpai_hand).count(tile) >= 4:
-                            if tenpai_ignore:
-                                pass
+            #if True:
+                if "w" in tenpai_hand:
+                    if len(re.findall(r"[0-9][mpsz]", tenpai_hand)) == 0:
+                        tenpai_meld = "1s1s1s.1s1s1s.1s1s1s.1s1s1s"
+                    elif len(re.findall(r"[0-9][mpsz]", tenpai_hand)) == 3:
+                        tenpai_meld = "1s1s1s.1s1s1s.1s1s1s"
+                    elif len(re.findall(r"[0-9][mpsz]", tenpai_hand)) == 6:
+                        tenpai_meld = "1s1s1s.1s1s1s"
+                    elif len(re.findall(r"[0-9][mpsz]", tenpai_hand)) == 9:
+                        tenpai_meld = "1s1s1s"
+                    elif len(re.findall(r"[0-9][mpsz]", tenpai_hand)) == 12:
+                        tenpai_meld = ""
+                    else:
+                        raise Exception
+                    w_tenpai_count = False
+                    for tile in TENPAI_ALL_TILE:
+                        w_tenpai_input = f"{tenpai_hand}{tile},{tenpai_meld},00000,,1z1z"
+                        if w_cal_han(w_tenpai_input, True, True)[1] != -1:
+                            if re.findall(r"[0-9][mpsz]", tenpai_hand).count(tile) >= 4:
+                                if tenpai_ignore:
+                                    pass
+                                else:
+                                    st.error(tile + "(已拿四张)")
+                                    w_tenpai_count = True
                             else:
-                                st.error(tile+"(已拿四张)")
+                                st.success(tile)
+                                w_tenpai_count = True
+                    if w_tenpai_count == False:
+                        st.error(["没听", "Noten"][lan])
+                else:
+                    if len(re.findall(r"[0-9][mpsz]", tenpai_hand)) == 1:
+                        tenpai_meld = "1s1s1s.1s1s1s.1s1s1s.1s1s1s"
+                    elif len(re.findall(r"[0-9][mpsz]", tenpai_hand)) == 4:
+                        tenpai_meld = "1s1s1s.1s1s1s.1s1s1s"
+                    elif len(re.findall(r"[0-9][mpsz]", tenpai_hand)) == 7:
+                        tenpai_meld = "1s1s1s.1s1s1s"
+                    elif len(re.findall(r"[0-9][mpsz]", tenpai_hand)) == 10:
+                        tenpai_meld = "1s1s1s"
+                    elif len(re.findall(r"[0-9][mpsz]", tenpai_hand)) == 13:
+                        tenpai_meld = ""
+                    else:
+                        raise Exception
+                    tenpai_count = False
+                    for tile in TENPAI_ALL_TILE:
+                        tenpai_input = f"{tenpai_hand}{tile},{tenpai_meld},00000,,1z1z"
+                        if cal_han(tenpai_input, True, 0, False)[0]:
+                            if re.findall(r"[0-9][mpsz]", tenpai_hand).count(tile) >= 4:
+                                if tenpai_ignore:
+                                    pass
+                                else:
+                                    st.error(tile + "(已拿四张)")
+                                    tenpai_count = True
+                            else:
+                                st.success(tile)
                                 tenpai_count = True
-                        else:
-                            st.success(tile)
-                            tenpai_count = True
-                if tenpai_count == False:
-                    st.error(["没听","Noten"][lan])
+                    if tenpai_count == False:
+                        st.error(["没听", "Noten"][lan])
             except Exception:
                 st.error(["请检查输入","Please Check Your Input"][lan])
         else:
             try:
+            #if True:
                 tenpai_check = False
                 tenpai_tiles_hand_meld = re.findall(r"[0-9][mpsz]", tenpai_hand)
                 tenpai_input1 = ","
@@ -1904,7 +1954,10 @@ with tab4:
                     tenpai_st_output = f"{tile} "
                     for tenpai_tr in ["0", "1"]:
                         tenpai_input3 = tenpai_hand + tile + tenpai_input1 + tenpai_tr + tenpai_input2
-                        tenpai_cal_han_output = cal_han(tenpai_input3, tenpai_double_yakuman, lan, False)[0]
+                        if "w" in tenpai_hand:
+                            tenpai_cal_han_output = w_cal_han(tenpai_input3, tenpai_double_yakuman, False)[0]
+                        else:
+                            tenpai_cal_han_output = cal_han(tenpai_input3, tenpai_double_yakuman, lan, False)[0]
                         if tenpai_cal_han_output:
                             if tenpai_tr == "0":
                                 tenpai_st_output += f"( {["荣", "Ron"][lan]}: {tenpai_cal_han_output} / "
