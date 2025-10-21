@@ -1553,7 +1553,7 @@ with tab2:
                     st.markdown(f"<h2 style='text-align: center;'>[{st.session_state.tz4[0]}]</h2>",unsafe_allow_html=True)
                 with col93:
                     st.markdown(f"<h2 style='text-align: center;'>[{st.session_state.tz4[1]}]</h2>",unsafe_allow_html=True)
-                col81, col82 = st.columns([4, 1])
+                col81, col83, col82 = st.columns([1,3,1])
                 with col81:
                     if st.button(["撤回操作","Undo"][lan]):
                         if len(st.session_state.point_history4) > 1:
@@ -1569,6 +1569,19 @@ with tab2:
                         st.session_state.start4 = False
                         st.session_state.point_history4 = []
                         st.rerun()
+                @st.dialog(["手动修改","Manual Edit Point"][lan])
+                def edit_4m():
+                    edit0 = st.number_input(st.session_state.player_list4[0],value=st.session_state.point_list4[0])
+                    edit1 = st.number_input(st.session_state.player_list4[1], value=st.session_state.point_list4[1])
+                    edit2 = st.number_input(st.session_state.player_list4[2], value=st.session_state.point_list4[2])
+                    edit3 = st.number_input(st.session_state.player_list4[3], value=st.session_state.point_list4[3])
+                    if st.button(["修改","Edit"][lan]):
+                        st.session_state.point_list4 = [edit0, edit1, edit2, edit3, st.session_state.point_list4[4]]
+                        st.session_state.point_history4.append(st.session_state.point_list4.copy())
+                        st.rerun()
+                with col83:
+                    if st.button(["手动修改","Manual Edit Point"][lan]):
+                        edit_4m()
                 if error_message:
                     st.error(error_message)
                     error_message = ""
@@ -1788,7 +1801,7 @@ with tab2:
                 with col393:
                     st.markdown(f"<h2 style='text-align: center;'>[{st.session_state.tz3[1]}]</h2>",
                                 unsafe_allow_html=True)
-                col381, col382 = st.columns([4, 1])
+                col381, col383, col382 = st.columns([1,3,1])
                 with col381:
                     if st.button(["撤回操作", "Undo"][lan], key = "47"):
                         if len(st.session_state.point_history3) > 1:
@@ -1804,6 +1817,18 @@ with tab2:
                         st.session_state.start3 = False
                         st.session_state.point_history3 = []
                         st.rerun()
+                @st.dialog(["手动修改", "Manual Edit Point"][lan])
+                def edit_3m():
+                    edit0 = st.number_input(st.session_state.player_list3[0], value=st.session_state.point_list3[0])
+                    edit1 = st.number_input(st.session_state.player_list3[1], value=st.session_state.point_list3[1])
+                    edit2 = st.number_input(st.session_state.player_list3[2], value=st.session_state.point_list3[2])
+                    if st.button(["修改", "Edit"][lan]):
+                        st.session_state.point_list3 = [edit0, edit1, edit2, st.session_state.point_list3[3], st.session_state.point_list3[4]]
+                        st.session_state.point_history3.append(st.session_state.point_list3.copy())
+                        st.rerun()
+                with col383:
+                    if st.button(["手动修改", "Manual Edit Point"][lan], key="a1"):
+                        edit_3m()
                 if error_message_3:
                     st.error(error_message_3)
                     error_message_3 = ""
@@ -1843,7 +1868,7 @@ with tab4:
             if lan == 1:
                 tenpai_wind2 = {"East": "东", "South": "南", "West": "西", "North": "北"}[tenpai_wind2]
         tenpai_double_yakuman = st.checkbox(["国士无双十三面，纯正九莲宝灯，四暗刻单骑，大四喜是双倍役满","Kokushi Muso Juusanmen, Junsei Churen Poto, Suu Ankou Tanki, Dai Suushi are double yakuman"][lan],value=True,key="t9")
-    tenpai_ignore = st.checkbox(["忽视已拿4张的听牌","Ignoring Tenpai With 4 Tiles Already Had"][lan])
+    tenpai_ignore = st.checkbox(["忽视已拿4张的听牌","Ignoring Tenpai With 4 Tiles Already Had"][lan], value=True)
 
     def w_cal_han(w_cal_ipt,w_ipt11,fast):
         ALL_WW_TILE = ["1m", "2m", "3m", "4m", "5m", "6m", "7m", "8m", "9m",
@@ -1881,18 +1906,28 @@ with tab4:
                     else:
                         raise Exception
                     w_tenpai_count = False
+                    ten_all_w = []
                     for tile in TENPAI_ALL_TILE:
                         w_tenpai_input = f"{tenpai_hand}{tile},{tenpai_meld},00000,,1z1z"
                         if w_cal_han(w_tenpai_input, True, True)[1] != -1:
                             if re.findall(r"[0-9][mpsz]", tenpai_hand).count(tile) >= 4:
                                 if tenpai_ignore:
-                                    pass
+                                    ten_all_w.append(False)
                                 else:
-                                    st.error(tile + "(已拿四张)")
+                                    ten_all_w.append(tile + ["(已拿四张)"," (Had 4 Already)"][lan])
                                     w_tenpai_count = True
                             else:
-                                st.success(tile)
+                                ten_all_w.append(tile)
                                 w_tenpai_count = True
+                    if len(ten_all_w) == 34:
+                        st.success(["听全部","All Tiles"][lan])
+                    else:
+                        for tile in ten_all_w:
+                            if tile:
+                                if tile[-1] == ")":
+                                    st.error(tile)
+                                else:
+                                    st.success(tile)
                     if w_tenpai_count == False:
                         st.error(["没听", "Noten"][lan])
                 else:
@@ -1916,7 +1951,7 @@ with tab4:
                                 if tenpai_ignore:
                                     pass
                                 else:
-                                    st.error(tile + "(已拿四张)")
+                                    st.error(tile + ["(已拿四张)"," (Had 4 Already)"][lan])
                                     tenpai_count = True
                             else:
                                 st.success(tile)
@@ -1968,7 +2003,7 @@ with tab4:
                             if tenpai_ignore:
                                 pass
                             else:
-                                tenpai_st_output += [" (已拿四张)", " (Had 4 Already)"][lan]
+                                tenpai_st_output += [" (已拿四张)", " ( Had 4 Already )"][lan]
                                 st.error(tenpai_st_output)
                                 tenpai_check = True
                         else:
@@ -2003,7 +2038,7 @@ with (tab5):
         qing_type = "s"
     elif qing_type == "万字" or qing_type == "Manzu":
         qing_type = "m"
-    if st.button(["生成新的 (生成耗时可能较长请耐心等待)", "Generate A New One (Might Take A While)"][lan]):
+    if st.button(["生成新的 (最小听牌数越多生成耗时越久，请耐心等待)", "Generate A New One (Might Take A While If High Minimum Tenpai Number)"][lan]):
         while True:
             random.shuffle(QING_ALL_TILE)
             qing_hand = sorted(QING_ALL_TILE[0:13])
