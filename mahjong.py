@@ -530,7 +530,7 @@ def cal_han(cal_han_user_input, cal_double, cal_lan, cal_output):
                 return_title = f"{["役满","Yakuman"][cal_lan]}"
             else:
                 return_title = f"{chinese_number[yakuman_han[max_index]]}{["倍役满"," Yakuman"][cal_lan]}"
-            return_title = [return_title, yakuman_han[max_index]*100]
+            return_title = [return_title, yakuman_han[max_index]*100+len(yakuman[max_index])]
             return return_title
 
     # 计番(普通役)
@@ -1316,7 +1316,8 @@ with tab1:
                 w_han_list.append(cal_han(w_tile + cal_ipt, ipt11, lan, False)[1])
             w_max_index = w_han_list.index(max(w_han_list))
             cal_ipt = ALL_W_TILE[w_max_index] + cal_ipt
-            st.text([f"万象牌是{ALL_W_TILE[w_max_index]}",f"Wild Card Is {ALL_W_TILE[w_max_index]}"][lan])
+            if max(w_han_list) != -1:
+                st.text([f"万象牌是{ALL_W_TILE[w_max_index]}",f"Wild Card Is {ALL_W_TILE[w_max_index]}"][lan])
             cal_han(cal_ipt, ipt11, lan, True)
 
     except Exception:
