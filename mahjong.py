@@ -2028,7 +2028,7 @@ with (tab5):
                      "1s", "2s", "3s", "4s", "5s", "6s", "7s", "8s", "9s"]
     qcol1, qcol2 = st.columns([2, 1])
     with qcol1:
-        minimum_tenpai = st.slider(["最小听牌数", "Minimum Tenpai Number"][lan], min_value=1, max_value=7)
+        minimum_tenpai = st.slider(["最小听牌数", "Minimum Tenpai Number"][lan], min_value=1, max_value=9)
     with qcol2:
         qing_type = st.selectbox(["数牌类型", "Type"][lan],
                                  [["饼子", "索子", "万字"], ["Pinzu", "Souzu", "Manzu"]][lan], index=1)
