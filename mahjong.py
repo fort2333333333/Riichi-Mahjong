@@ -3,6 +3,26 @@ import re
 import streamlit as st
 import random
 
+
+def sim_meld(sim_meld_input):
+    s_letter = ""
+    for sim_letter in ["s","z","m","p"]:
+        if sim_letter in sim_meld_input:
+            s_letter = sim_letter
+    s_number = ""
+    sim_a = ""
+    if "a" in sim_meld_input:
+        sim_a = "a"
+        sim_meld_input.replace("a","")
+    if s_letter:
+        for sim_number in sim_meld_input:
+            if sim_number in "0123456789":
+                s_number += sim_number
+        s_number += s_letter
+        s_number += sim_a
+    return s_number
+
+
 def meld_check(meld_check_meld):
     if len(meld_check_meld) == 3:
         if meld_check_meld[0][1] == meld_check_meld[1][1] == meld_check_meld[2][1]:
@@ -49,12 +69,12 @@ def cal_han(cal_han_user_input, cal_double, cal_lan, cal_output):
                 re_st_han_output += f"{["手牌：","Hand："][print_lan]}"
                 for print_total_meld in print_total_total_tile[1]:
                     print(print_total_meld, end=" ")
-                    re_st_han_output += f"{print_total_meld} "
+                    re_st_han_output += f"{sim_meld(print_total_meld)} "
                 print("\n副露：", end="")
                 re_st_han_output += f"\n{["副露：","Meld："][print_lan]}"
                 for print_total_meld in print_total_total_tile[2]:
                     print(print_total_meld, end=" ")
-                    re_st_han_output += f"{print_total_meld} "
+                    re_st_han_output += f"{sim_meld(print_total_meld)} "
                 if print_total_total_tile[2]:
                     print()
                     re_st_han_output += "\n"
@@ -74,7 +94,7 @@ def cal_han(cal_han_user_input, cal_double, cal_lan, cal_output):
                 print_total_total_tile[1] = arranged_q
                 for print_total_meld in print_total_total_tile[1]:
                     print(print_total_meld, end=" ")
-                    re_st_han_output += f"{print_total_meld} "
+                    re_st_han_output += f"{sim_meld(print_total_meld)} "
                 print()
                 re_st_han_output += "\n"
             case "G":
@@ -909,7 +929,7 @@ def cal_han(cal_han_user_input, cal_double, cal_lan, cal_output):
                         else:
                             add_fu = 1
                     if add_fu:
-                        fu_cal += f"- {meld}："
+                        fu_cal += f"- {sim_meld(meld)}："
                         if meld[0:2] in ["1m", "9m", "1s", "9s", "1p", "9p", "1z", "2z", "3z", "4z", "5z", "6z", "7z"]:
                             fu += 4 * add_fu
                             match 4*add_fu:
@@ -937,7 +957,7 @@ def cal_han(cal_han_user_input, cal_double, cal_lan, cal_output):
                             case 9:
                                 add_fu = 8
                     if add_fu:
-                        fu_cal += f"- {meld}: "
+                        fu_cal += f"- {sim_meld(meld)}: "
                         if meld[0:2] in ["1m", "9m", "1s", "9s", "1p", "9p", "1z", "2z", "3z", "4z", "5z", "6z", "7z"]:
                             fu += 4 * add_fu
                             match 4 * add_fu:
@@ -964,16 +984,16 @@ def cal_han(cal_han_user_input, cal_double, cal_lan, cal_output):
                 # 雀头
                 if wind[0] in checked_total_tile[max_index][1][-1]:
                     fu += 2
-                    fu_cal += f"- {checked_total_tile[max_index][1][-1]}："
+                    fu_cal += f"- {sim_meld(checked_total_tile[max_index][1][-1])}："
                     fu_cal += ["场风牌雀头，+2符\n","Round Wind Pair, + 2 Fu\n"][lan]
                 if wind[1] in checked_total_tile[max_index][1][-1]:
                     fu += 2
-                    fu_cal += f"- {checked_total_tile[max_index][1][-1]}："
+                    fu_cal += f"- {sim_meld(checked_total_tile[max_index][1][-1])}："
                     fu_cal += ["自风牌雀头，+2符\n","Seat Wind Pair, + 2 Fu\n"][lan]
                 if "5z" in checked_total_tile[max_index][1][-1] or "6z" in checked_total_tile[max_index][1][
                     -1] or "7z" in \
                         checked_total_tile[max_index][1][-1]:
-                    fu_cal += f"- {checked_total_tile[max_index][1][-1]}："
+                    fu_cal += f"- {sim_meld(checked_total_tile[max_index][1][-1])}："
                     fu_cal += ["三元牌雀头，+2符\n","Dragon Pair, + 2 Fu\n"][lan]
                     fu += 2
 
