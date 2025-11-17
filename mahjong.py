@@ -1201,8 +1201,9 @@ def ful_hand(hand_ipt):
 
 
 st.title("立直麻将计算器/ Riichi_Mahjong_Calculator")
-lan = ["简体中文","English"].index(st.selectbox("语言/Language", ["简体中文","English"]))
-st.text(["若使用手机/平板，使用横屏获得更佳体验 OwO","If using phone/tablet, switch to landscape mode for better experience OwO"][lan])
+with st.sidebar:
+    lan = ["简体中文","English"].index(st.selectbox("语言/Language", ["简体中文","English"]))
+    st.text(["若使用手机/平板，使用横屏获得更佳体验 OwO","If using phone/tablet, switch to landscape mode for better experience OwO"][lan])
 tab1, tab2, tab4, tab5, tab3 = st.tabs([f"{["点数计算机", "Point Calculator"][lan]}", f"{["点数追踪", "Point Tracker"][lan]}", ["听牌计算机","Tenpai Calculator"][lan], ["清一色听牌练习","Chinitsu Tenpai Practice"][lan], ["反馈","Feedback"][lan]])
 with tab1:
     st.title(f"{["点数计算机", "Point Calcuator"][lan]}")
