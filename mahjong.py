@@ -1863,7 +1863,9 @@ with tab4:
                     "1z","2z","3z","4z","5z","6z","7z"]
     st.title(["听牌计算机","Tenpai Calculator"][lan])
     tenpai_hand = ful_hand(st.text_input(["手牌","Hand"][lan],key="t3").lower().replace(" ",""))
-    tenpai_fanfu = st.checkbox(["番符计算（需要输入更多信息）","Han, Fu Caculation (More Information Are Needed)"][lan])
+    col123, col124 = st.columns(2)
+    with col123:
+        tenpai_fanfu = st.toggle(["番符计算（需要输入更多信息）","Han, Fu Caculation (More Information Are Needed)"][lan])
     if tenpai_fanfu:
         t4c1, t4c2, t4c3, t4c4 = st.columns(4)
         with t4c1:
@@ -1888,7 +1890,8 @@ with tab4:
             if lan == 1:
                 tenpai_wind2 = {"East": "东", "South": "南", "West": "西", "North": "北"}[tenpai_wind2]
         tenpai_double_yakuman = st.checkbox(["国士无双十三面，纯正九莲宝灯，四暗刻单骑，大四喜是双倍役满","Kokushi Muso Juusanmen, Junsei Churen Poto, Suu Ankou Tanki, Dai Suushi are double yakuman"][lan],value=True,key="t9")
-    tenpai_ignore = st.checkbox(["忽视已拿4张的听牌","Ignoring Tenpai With 4 Tiles Already Had"][lan], value=True)
+    with col124:
+        tenpai_ignore = st.toggle(["忽视已拿4张的听牌","Ignoring Tenpai With 4 Tiles Already Had"][lan], value=True)
 
     def w_cal_han(w_cal_ipt,w_ipt11,fast):
         ALL_WW_TILE = ["1m", "2m", "3m", "4m", "5m", "6m", "7m", "8m", "9m",
