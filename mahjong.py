@@ -504,6 +504,9 @@ def cal_han(cal_han_user_input, cal_double, cal_lan, cal_output, cal_allow_mode)
                     yakuman[index].append(["九莲宝灯", "役满"])
                     yakuman_han[index] += 1
 
+        #大七星
+        st.text(raw_total_tile)
+
     if cal_lan == 0:
         chinese_number = {1: "一", 2: "双", 3: "三", 4: "四", 5: "五", 6: "六", 7: "七", 8: "八", 9: "九"}
     else:
@@ -1350,21 +1353,21 @@ if page == 1:
                     if "九莲宝灯" in st.session_state.allow_yaku:
                         st.session_state.allow_yaku.remove("九莲宝灯")
                 # 四暗刻
-                if st.toggle("四暗刻/四暗刻单骑", value = "四暗刻" in st.session_state.allow_yaku, help = "有4组没有碰的刻子"):
+                if st.toggle("四暗刻/四暗刻单骑", value = "四暗刻" in st.session_state.allow_yaku, help = "4组没有碰的刻子"):
                     if "四暗刻" not in st.session_state.allow_yaku:
                         st.session_state.allow_yaku.append("四暗刻")
                 else:
                     if "四暗刻" in st.session_state.allow_yaku:
                         st.session_state.allow_yaku.remove("四暗刻")
                 # 大三元
-                if st.toggle("大三元", value = "大三元" in st.session_state.allow_yaku, help = "有白发中的刻子"):
+                if st.toggle("大三元", value = "大三元" in st.session_state.allow_yaku, help = "白发中的刻子"):
                     if "大三元" not in st.session_state.allow_yaku:
                         st.session_state.allow_yaku.append("大三元")
                 else:
                     if "大三元" in st.session_state.allow_yaku:
                         st.session_state.allow_yaku.remove("大三元")
                 # 小四喜
-                if st.toggle("小四喜/大四喜", value = "小四喜" in st.session_state.allow_yaku, help = "有四种四喜牌且至少三种四喜牌的刻子"):
+                if st.toggle("小四喜/大四喜", value = "小四喜" in st.session_state.allow_yaku, help = "四种四喜牌且至少三种四喜牌的刻子"):
                     if "小四喜" not in st.session_state.allow_yaku:
                         st.session_state.allow_yaku.append("小四喜")
                 else:
@@ -1414,210 +1417,210 @@ if page == 1:
                         st.session_state.allow_yaku.remove("地和")
             with set_yaku:
                 # 立直
-                if st.toggle("立直", value = "立直" in st.session_state.allow_yaku):
+                if st.toggle("立直", value = "立直" in st.session_state.allow_yaku, help = "立直后和牌"):
                     if "立直" not in st.session_state.allow_yaku:
                         st.session_state.allow_yaku.append("立直")
                 else:
                     if "立直" in st.session_state.allow_yaku:
                         st.session_state.allow_yaku.remove("立直")
                 # 双立直
-                if st.toggle("双立直", value = "双立直" in st.session_state.allow_yaku):
+                if st.toggle("双立直", value = "双立直" in st.session_state.allow_yaku, help = "无人鸣牌时第一巡立直"):
                     if "双立直" not in st.session_state.allow_yaku:
                         st.session_state.allow_yaku.append("双立直")
                 else:
                     if "双立直" in st.session_state.allow_yaku:
                         st.session_state.allow_yaku.remove("双立直")
                 # 段幺九
-                if st.toggle("段幺九", value = "段幺九" in st.session_state.allow_yaku):
+                if st.toggle("段幺九", value = "段幺九" in st.session_state.allow_yaku, help = "没有幺九牌"):
                     if "段幺九" not in st.session_state.allow_yaku:
                         st.session_state.allow_yaku.append("段幺九")
                 else:
                     if "段幺九" in st.session_state.allow_yaku:
                         st.session_state.allow_yaku.remove("段幺九")
                 # 门前清自摸和
-                if st.toggle("门前清自摸和", value = "门前清自摸和" in st.session_state.allow_yaku):
+                if st.toggle("门前清自摸和", value = "门前清自摸和" in st.session_state.allow_yaku, help = "无副露时自摸和牌"):
                     if "门前清自摸和" not in st.session_state.allow_yaku:
                         st.session_state.allow_yaku.append("门前清自摸和")
                 else:
                     if "门前清自摸和" in st.session_state.allow_yaku:
                         st.session_state.allow_yaku.remove("门前清自摸和")
                 # 役牌：自风牌
-                if st.toggle("役牌：自风牌", value = "役牌：自风牌" in st.session_state.allow_yaku):
+                if st.toggle("役牌：自风牌", value = "役牌：自风牌" in st.session_state.allow_yaku, help = "自风牌刻子"):
                     if "役牌：自风牌" not in st.session_state.allow_yaku:
                         st.session_state.allow_yaku.append("役牌：自风牌")
                 else:
                     if "役牌：自风牌" in st.session_state.allow_yaku:
                         st.session_state.allow_yaku.remove("役牌：自风牌")
                 # 役牌：场风牌
-                if st.toggle("役牌：场风牌", value = "役牌：场风牌" in st.session_state.allow_yaku):
+                if st.toggle("役牌：场风牌", value = "役牌：场风牌" in st.session_state.allow_yaku, help = "场风牌刻子"):
                     if "役牌：场风牌" not in st.session_state.allow_yaku:
                         st.session_state.allow_yaku.append("役牌：场风牌")
                 else:
                     if "役牌：场风牌" in st.session_state.allow_yaku:
                         st.session_state.allow_yaku.remove("役牌：场风牌")
                 # 役牌：白
-                if st.toggle("役牌：白", value = "役牌：白" in st.session_state.allow_yaku):
+                if st.toggle("役牌：白", value = "役牌：白" in st.session_state.allow_yaku, help = "白刻子"):
                     if "役牌：白" not in st.session_state.allow_yaku:
                         st.session_state.allow_yaku.append("役牌：白")
                 else:
                     if "役牌：白" in st.session_state.allow_yaku:
                         st.session_state.allow_yaku.remove("役牌：白")
                 # 役牌：发
-                if st.toggle("役牌：发", value = "役牌：发" in st.session_state.allow_yaku):
+                if st.toggle("役牌：发", value = "役牌：发" in st.session_state.allow_yaku, help = "发刻子"):
                     if "役牌：发" not in st.session_state.allow_yaku:
                         st.session_state.allow_yaku.append("役牌：发")
                 else:
                     if "役牌：发" in st.session_state.allow_yaku:
                         st.session_state.allow_yaku.remove("役牌：发")
                 # 役牌：中
-                if st.toggle("役牌：中", value = "役牌：中" in st.session_state.allow_yaku):
+                if st.toggle("役牌：中", value = "役牌：中" in st.session_state.allow_yaku, help = "中刻子"):
                     if "役牌：中" not in st.session_state.allow_yaku:
                         st.session_state.allow_yaku.append("役牌：中")
                 else:
                     if "役牌：中" in st.session_state.allow_yaku:
                         st.session_state.allow_yaku.remove("役牌：中")
                 # 平和
-                if st.toggle("平和", value = "平和" in st.session_state.allow_yaku):
+                if st.toggle("平和", value = "平和" in st.session_state.allow_yaku, help = "4顺子+不是役牌的雀头+2面听"):
                     if "平和" not in st.session_state.allow_yaku:
                         st.session_state.allow_yaku.append("平和")
                 else:
                     if "平和" in st.session_state.allow_yaku:
                         st.session_state.allow_yaku.remove("平和")
                 # 一杯口
-                if st.toggle("一杯口", value = "一杯口" in st.session_state.allow_yaku):
+                if st.toggle("一杯口", value = "一杯口" in st.session_state.allow_yaku, help = "两组一样的顺子"):
                     if "一杯口" not in st.session_state.allow_yaku:
                         st.session_state.allow_yaku.append("一杯口")
                 else:
                     if "一杯口" in st.session_state.allow_yaku:
                         st.session_state.allow_yaku.remove("一杯口")
                 # 二杯口
-                if st.toggle("二杯口", value = "二杯口" in st.session_state.allow_yaku):
+                if st.toggle("二杯口", value = "二杯口" in st.session_state.allow_yaku, help = "两组一杯口"):
                     if "二杯口" not in st.session_state.allow_yaku:
                         st.session_state.allow_yaku.append("二杯口")
                 else:
                     if "二杯口" in st.session_state.allow_yaku:
                         st.session_state.allow_yaku.remove("二杯口")
                 # 一发
-                if st.toggle("一发", value = "一发" in st.session_state.allow_yaku):
+                if st.toggle("一发", value = "一发" in st.session_state.allow_yaku, help = "无人鸣牌时立直后一巡内和牌"):
                     if "一发" not in st.session_state.allow_yaku:
                         st.session_state.allow_yaku.append("一发")
                 else:
                     if "一发" in st.session_state.allow_yaku:
                         st.session_state.allow_yaku.remove("一发")
                 # 岭上开花
-                if st.toggle("岭上开花", value = "岭上开花" in st.session_state.allow_yaku):
+                if st.toggle("岭上开花", value = "岭上开花" in st.session_state.allow_yaku, help = "摸岭上牌和牌"):
                     if "岭上开花" not in st.session_state.allow_yaku:
                         st.session_state.allow_yaku.append("岭上开花")
                 else:
                     if "岭上开花" in st.session_state.allow_yaku:
                         st.session_state.allow_yaku.remove("岭上开花")
                 # 枪杠
-                if st.toggle("枪杠", value = "枪杠" in st.session_state.allow_yaku):
+                if st.toggle("枪杠", value = "枪杠" in st.session_state.allow_yaku, help = "荣和加杠"):
                     if "枪杠" not in st.session_state.allow_yaku:
                         st.session_state.allow_yaku.append("枪杠")
                 else:
                     if "枪杠" in st.session_state.allow_yaku:
                         st.session_state.allow_yaku.remove("枪杠")
                 # 海底摸月
-                if st.toggle("海底摸月", value = "海底摸月" in st.session_state.allow_yaku):
+                if st.toggle("海底摸月", value = "海底摸月" in st.session_state.allow_yaku, help = "最后一张牌自摸和牌"):
                     if "海底摸月" not in st.session_state.allow_yaku:
                         st.session_state.allow_yaku.append("海底摸月")
                 else:
                     if "海底摸月" in st.session_state.allow_yaku:
                         st.session_state.allow_yaku.remove("海底摸月")
                 # 河底捞鱼
-                if st.toggle("河底捞鱼", value = "河底捞鱼" in st.session_state.allow_yaku):
+                if st.toggle("河底捞鱼", value = "河底捞鱼" in st.session_state.allow_yaku, help = "最后一张牌荣和"):
                     if "河底捞鱼" not in st.session_state.allow_yaku:
                         st.session_state.allow_yaku.append("河底捞鱼")
                 else:
                     if "河底捞鱼" in st.session_state.allow_yaku:
                         st.session_state.allow_yaku.remove("河底捞鱼")
                 # 三色同刻
-                if st.toggle("三色同刻", value = "三色同刻" in st.session_state.allow_yaku):
+                if st.toggle("三色同刻", value = "三色同刻" in st.session_state.allow_yaku, help = "三组同数字的刻子"):
                     if "三色同刻" not in st.session_state.allow_yaku:
                         st.session_state.allow_yaku.append("三色同刻")
                 else:
                     if "三色同刻" in st.session_state.allow_yaku:
                         st.session_state.allow_yaku.remove("三色同刻")
                 # 三杠子
-                if st.toggle("三杠子", value = "三杠子" in st.session_state.allow_yaku):
+                if st.toggle("三杠子", value = "三杠子" in st.session_state.allow_yaku, help = "开杠三次"):
                     if "三杠子" not in st.session_state.allow_yaku:
                         st.session_state.allow_yaku.append("三杠子")
                 else:
                     if "三杠子" in st.session_state.allow_yaku:
                         st.session_state.allow_yaku.remove("三杠子")
                 # 对对和
-                if st.toggle("对对和", value = "对对和" in st.session_state.allow_yaku):
+                if st.toggle("对对和", value = "对对和" in st.session_state.allow_yaku, help = "全是刻子"):
                     if "对对和" not in st.session_state.allow_yaku:
                         st.session_state.allow_yaku.append("对对和")
                 else:
                     if "对对和" in st.session_state.allow_yaku:
                         st.session_state.allow_yaku.remove("对对和")
                 # 三暗刻
-                if st.toggle("三暗刻", value = "三暗刻" in st.session_state.allow_yaku):
+                if st.toggle("三暗刻", value = "三暗刻" in st.session_state.allow_yaku, help = "三组没有碰的刻子"):
                     if "三暗刻" not in st.session_state.allow_yaku:
                         st.session_state.allow_yaku.append("三暗刻")
                 else:
                     if "三暗刻" in st.session_state.allow_yaku:
                         st.session_state.allow_yaku.remove("三暗刻")
                 # 小三元
-                if st.toggle("小三元", value = "小三元" in st.session_state.allow_yaku):
+                if st.toggle("小三元", value = "小三元" in st.session_state.allow_yaku, help = "2组白发中的刻子+1组白发中的对子"):
                     if "小三元" not in st.session_state.allow_yaku:
                         st.session_state.allow_yaku.append("小三元")
                 else:
                     if "小三元" in st.session_state.allow_yaku:
                         st.session_state.allow_yaku.remove("小三元")
                 # 混老头
-                if st.toggle("混老头", value = "混老头" in st.session_state.allow_yaku):
+                if st.toggle("混老头", value = "混老头" in st.session_state.allow_yaku, help = "全是幺九牌"):
                     if "混老头" not in st.session_state.allow_yaku:
                         st.session_state.allow_yaku.append("混老头")
                 else:
                     if "混老头" in st.session_state.allow_yaku:
                         st.session_state.allow_yaku.remove("混老头")
                 # 纯全带幺九
-                if st.toggle("纯全带幺九", value = "纯全带幺九" in st.session_state.allow_yaku):
+                if st.toggle("纯全带幺九", value = "纯全带幺九" in st.session_state.allow_yaku, help = "所有面子都包含老头牌"):
                     if "纯全带幺九" not in st.session_state.allow_yaku:
                         st.session_state.allow_yaku.append("纯全带幺九")
                 else:
                     if "纯全带幺九" in st.session_state.allow_yaku:
                         st.session_state.allow_yaku.remove("纯全带幺九")
                 # 混全带幺九
-                if st.toggle("混全带幺九", value = "混全带幺九" in st.session_state.allow_yaku):
+                if st.toggle("混全带幺九", value = "混全带幺九" in st.session_state.allow_yaku, help = "所有面子都包含幺九牌"):
                     if "混全带幺九" not in st.session_state.allow_yaku:
                         st.session_state.allow_yaku.append("混全带幺九")
                 else:
                     if "混全带幺九" in st.session_state.allow_yaku:
                         st.session_state.allow_yaku.remove("混全带幺九")
                 # 七对子
-                if st.toggle("七对子", value = "七对子" in st.session_state.allow_yaku):
+                if st.toggle("七对子", value = "七对子" in st.session_state.allow_yaku, help = "7组对子"):
                     if "七对子" not in st.session_state.allow_yaku:
                         st.session_state.allow_yaku.append("七对子")
                 else:
                     if "七对子" in st.session_state.allow_yaku:
                         st.session_state.allow_yaku.remove("七对子")
                 # 一气通贯
-                if st.toggle("一气通贯", value = "一气通贯" in st.session_state.allow_yaku):
+                if st.toggle("一气通贯", value = "一气通贯" in st.session_state.allow_yaku, help = "同种数牌的123,456,789顺子"):
                     if "一气通贯" not in st.session_state.allow_yaku:
                         st.session_state.allow_yaku.append("一气通贯")
                 else:
                     if "一气通贯" in st.session_state.allow_yaku:
                         st.session_state.allow_yaku.remove("一气通贯")
                 # 三色同顺
-                if st.toggle("三色同顺", value = "三色同顺" in st.session_state.allow_yaku):
+                if st.toggle("三色同顺", value = "三色同顺" in st.session_state.allow_yaku, help = "三种数牌有相同数字的顺子"):
                     if "三色同顺" not in st.session_state.allow_yaku:
                         st.session_state.allow_yaku.append("三色同顺")
                 else:
                     if "三色同顺" in st.session_state.allow_yaku:
                         st.session_state.allow_yaku.remove("三色同顺")
                 # 清一色
-                if st.toggle("清一色", value = "清一色" in st.session_state.allow_yaku):
+                if st.toggle("清一色", value = "清一色" in st.session_state.allow_yaku, help = "只包含一种数牌"):
                     if "清一色" not in st.session_state.allow_yaku:
                         st.session_state.allow_yaku.append("清一色")
                 else:
                     if "清一色" in st.session_state.allow_yaku:
                         st.session_state.allow_yaku.remove("清一色")
                 # 混一色
-                if st.toggle("混一色", value = "混一色" in st.session_state.allow_yaku):
+                if st.toggle("混一色", value = "混一色" in st.session_state.allow_yaku, help = "只包含一组数牌+字牌"):
                     if "混一色" not in st.session_state.allow_yaku:
                         st.session_state.allow_yaku.append("混一色")
                 else:
@@ -2046,6 +2049,12 @@ elif page == 2:
                 if error_message:
                     st.error(error_message)
                     error_message = ""
+        else:
+            with trackermode2:
+                st.text("")
+                st.text("")
+                st.text("")
+                st.text(["(添加4个玩家以开始)","(Insert 4 Players to Continue)"][lan])
     else:
         error_message_3 = ""
         if 'player_list3' not in st.session_state:
@@ -2293,6 +2302,12 @@ elif page == 2:
                 if error_message_3:
                     st.error(error_message_3)
                     error_message_3 = ""
+        else:
+            with trackermode2:
+                st.text("")
+                st.text("")
+                st.text("")
+                st.text(["(添加3个玩家以开始)","(Insert 3 Players to Continue)"][lan])
 if page == 5:
     form_url = "https://docs.google.com/forms/d/e/1FAIpQLSe4clzw2E6KzdOirVOOGV6mSTG0S_XC9KdmKhb4QnnOwohUKg/viewform?usp=dialog"
     st.markdown(f'<a href="{form_url}" target="_blank">{["提交反馈","Report Issues Or Give Feedback"][lan]}</a>',
@@ -2502,7 +2517,7 @@ if page == 4:
         qing_type = "s"
     elif qing_type == "万字" or qing_type == "Manzu":
         qing_type = "m"
-    if st.button(["生成新的 (最小听牌数越多生成耗时越久，请耐心等待)", "Generate A New One (Might Take A While If High Minimum Tenpai Number)"][lan]):
+    if st.button(["生成新的 (最小听牌数越多生成耗时越久，请耐心等待(屎山代码发力了))", "Generate A New Hand (Might Take A While If Minimum Tenpai Number Is High)"][lan]):
         while True:
             random.shuffle(QING_ALL_TILE)
             qing_hand = sorted(QING_ALL_TILE[0:13])
