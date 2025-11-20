@@ -504,8 +504,6 @@ def cal_han(cal_han_user_input, cal_double, cal_lan, cal_output, cal_allow_mode)
                     yakuman[index].append(["九莲宝灯", "役满"])
                     yakuman_han[index] += 1
 
-        #大七星
-        st.text(raw_total_tile)
 
     if cal_lan == 0:
         chinese_number = {1: "一", 2: "双", 3: "三", 4: "四", 5: "五", 6: "六", 7: "七", 8: "八", 9: "九"}
