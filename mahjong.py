@@ -392,15 +392,23 @@ def cal_han(cal_han_user_input, cal_double, cal_lan, cal_output, cal_allow_mode)
                     yakuman[index].append(["四暗刻", "役满"])
                     yakuman_han[index] += 1
 
-        # 字一色
+        # 字一色/大七星
         tsuuiisou_check = True
         for tile in raw_total_tile:
             if tile[-1] != "z":
                 tsuuiisou_check = False
         if tsuuiisou_check:
-            if "字一色" in st.session_state.allow_yaku or cal_allow_mode:
-                yakuman[index].append(["字一色", "役满"])
-                yakuman_han[index] += 1
+            if total_tile[0] == "M":
+                if "字一色" in st.session_state.allow_yaku or cal_allow_mode:
+                    yakuman[index].append(["字一色", "役满"])
+                    yakuman_han[index] += 1
+            elif total_tile[0] == "Q":
+                if "大七星" in st.session_state.allow_yaku or cal_allow_mode:
+                    yakuman[index].append(["大七星", "双倍役满"])
+                    yakuman_han[index] += 2
+                elif "字一色" in st.session_state.allow_yaku or cal_allow_mode:
+                    yakuman[index].append(["字一色", "役满"])
+                    yakuman_han[index] += 1
 
         # 绿一色
         ryuuiisou_check = True
@@ -503,7 +511,42 @@ def cal_han(cal_han_user_input, cal_double, cal_lan, cal_output, cal_allow_mode)
                 if "九莲宝灯" in st.session_state.allow_yaku or cal_allow_mode:
                     yakuman[index].append(["九莲宝灯", "役满"])
                     yakuman_han[index] += 1
+        
+        # 大车轮
+        if raw_total_tile == ["2p","2p","3p","3p","4p","4p","5p","5p","6p","6p","7p","7p","8p","8p"]:
+            if "大车轮" in st.session_state.allow_yaku and cal_allow_mode != 1:
+                yakuman[index].append(["大车轮", "役满"])
+                yakuman_han[index] += 1
+        
+        # 大数邻
+        if raw_total_tile == ["2m","2m","3m","3m","4m","4m","5m","5m","6m","6m","7m","7m","8m","8m"]:
+            if "大数邻" in st.session_state.allow_yaku and cal_allow_mode != 1:
+                yakuman[index].append(["大数邻", "役满"])
+                yakuman_han[index] += 1
 
+        # 大竹林
+        if raw_total_tile == ["2s","2s","3s","3s","4s","4s","5s","5s","6s","6s","7s","7s","8s","8s"]:
+            if "大竹林" in st.session_state.allow_yaku and cal_allow_mode != 1:
+                yakuman[index].append(["大竹林", "役满"])
+                yakuman_han[index] += 1
+
+        # 石上三年
+        if info[3] == "1" or info[3] == "2":
+            pass
+        elif info[4] == "3" and info[1] == "2" and menzen:
+            if "石上三年" in st.session_state.allow_yaku and cal_allow_mode != 1:
+                yakuman[index].append(["石上三年", "役满"])
+                yakuman_han[index] += 1
+
+        # 黑一色
+        kuroiiso_check = True
+        for tile in raw_total_tile:
+            if tile not in ["2p", "4p", "8p", "1z", "2z", "3z", "4z"]:
+                kuroiiso_check = False
+        if kuroiiso_check:
+            if "黑一色" in st.session_state.allow_yaku and cal_allow_mode != 1:
+                yakuman[index].append(["黑一色", "役满"])
+                yakuman_han[index] += 1
 
     if cal_lan == 0:
         chinese_number = {1: "一", 2: "双", 3: "三", 4: "四", 5: "五", 6: "六", 7: "七", 8: "八", 9: "九"}
@@ -522,7 +565,9 @@ def cal_han(cal_han_user_input, cal_double, cal_lan, cal_output, cal_allow_mode)
                            "大三元": "Dai Sanjen", "小四喜": "Sho Suushi", "大四喜": "Dai Suushi",
                            "字一色": "Tsuuiiso", "绿一色": "Ryuuiiso", "清老头": "Chinrooto",
                            "四杠子": "Suu Kantsu", "天和": "Tenho", "地和": "Chiho", "役满": "Yakuman",
-                           "双倍役满": "Double Yakuman"}
+                           "双倍役满": "Double Yakuman", "大七星": "Dai Shichisei", "大竹林": "Dai Chikurin", 
+                           "大车轮": "Dai Sharin", "大数邻": "Dai Kazurin", "石上三年": "Ishino Uenimo San Nen",
+                           "黑一色": "Kuro Iiso"}
             if len(yakuman[max_index]) > 1:
                 for yaku in yakuman[max_index]:
                     #print(yaku[0] + " " + yaku[1])
@@ -951,27 +996,30 @@ def cal_han(cal_han_user_input, cal_double, cal_lan, cal_output, cal_allow_mode)
                     non_yakuman[index].append(["混一色", "3番"])
                     non_yakuman_han[index] += 3
 
+        # 宝牌/里宝牌
+        if non_yakuman_han[index] != 0:
+            dora_count = 0
+            for tile in dora:
+                if tile == "4z" and "8z" in dora:
+                    dora_count += dora.count("8z")
+                dora_count += raw_total_tile.count(tile)
+            if dora_count:
+                if ["立直", "1番"] in non_yakuman[index]:
+                    non_yakuman[index].append(["宝牌/里宝牌", f"{dora_count}番"])
+                else:
+                    non_yakuman[index].append(["宝牌", f"{dora_count}番"])
+            non_yakuman_han[index] += dora_count
+
     if max(non_yakuman_han) == 0:
         #print("哥么你这牌有役吗")
         if cal_output:
             for j in range(5):
-                st.error(["哥么你役去哪了？？？","Where Is Your Han Baby???"][cal_lan])
+                st.error(["哥么你役去哪了？？？","Where Is Your Han Bro???"][cal_lan])
         return_title = ["无役", "No Yaku"][cal_lan]
         return_title = [return_title,0]
         return return_title
     else:
         max_index = non_yakuman_han.index(max(non_yakuman_han))
-
-        # 宝牌/里宝牌
-        dora_count = 0
-        for tile in dora:
-            dora_count += raw_total_tile.count(tile)
-        if dora_count:
-            if ["立直", "1番"] in non_yakuman[max_index]:
-                non_yakuman[max_index].append(["宝牌/里宝牌", f"{dora_count}番"])
-            else:
-                non_yakuman[max_index].append(["宝牌", f"{dora_count}番"])
-        non_yakuman_han[max_index] += dora_count
 
         # 红宝牌
         if red_dora:
@@ -1333,7 +1381,7 @@ if page == 1:
         @st.dialog(["役种设置","Yaku Setting"][lan])
         def yaku_set():
 
-            set_yakuman, set_yaku = st.tabs(["役满","一般役"])
+            set_yakuman, set_yaku, set_old_yaku = st.tabs(["役满","一般役","古役"])
             with set_yakuman:
                 st.session_state.double_yakuman_open = st.toggle(f"{['国士无双十三面，纯正九莲宝灯，四暗刻单骑，大四喜计为双倍役满', 'Kokushi Muso Juusanmen, Junsei Churen Poto, Suu Ankou Tanki, Dai Suushi are double yakuman'][lan]}", value=st.session_state.double_yakuman_open)
                 # 国士无双
@@ -1624,6 +1672,50 @@ if page == 1:
                 else:
                     if "混一色" in st.session_state.allow_yaku:
                         st.session_state.allow_yaku.remove("混一色")
+            with set_old_yaku:
+                # 大七星
+                if st.toggle("大七星", value = "大七星" in st.session_state.allow_yaku, help = "七种字牌组成的七对子"):
+                    if "大七星" not in st.session_state.allow_yaku:
+                        st.session_state.allow_yaku.append("大七星")
+                else:
+                    if "大七星" in st.session_state.allow_yaku:
+                        st.session_state.allow_yaku.remove("大七星")
+                # 大竹林
+                if st.toggle("大竹林", value = "大竹林" in st.session_state.allow_yaku, help = "22334455667788索"):
+                    if "大竹林" not in st.session_state.allow_yaku:
+                        st.session_state.allow_yaku.append("大竹林")
+                else:
+                    if "大竹林" in st.session_state.allow_yaku:
+                        st.session_state.allow_yaku.remove("大竹林")
+                # 大车轮
+                if st.toggle("大车轮", value = "大车轮" in st.session_state.allow_yaku, help = "22334455667788饼"):
+                    if "大车轮" not in st.session_state.allow_yaku:
+                        st.session_state.allow_yaku.append("大车轮")
+                else:
+                    if "大车轮" in st.session_state.allow_yaku:
+                        st.session_state.allow_yaku.remove("大车轮")
+                # 大数邻
+                if st.toggle("大数邻", value = "大数邻" in st.session_state.allow_yaku, help = "22334455667788万"):
+                    if "大数邻" not in st.session_state.allow_yaku:
+                        st.session_state.allow_yaku.append("大数邻")
+                else:
+                    if "大数邻" in st.session_state.allow_yaku:
+                        st.session_state.allow_yaku.remove("大数邻")
+                # 石上三年
+                if st.toggle("石上三年", value = "石上三年" in st.session_state.allow_yaku, help = "双立直+海底"):
+                    if "石上三年" not in st.session_state.allow_yaku:
+                        st.session_state.allow_yaku.append("石上三年")
+                else:
+                    if "石上三年" in st.session_state.allow_yaku:
+                        st.session_state.allow_yaku.remove("石上三年")
+                # 黑一色
+                if st.toggle("黑一色", value = "黑一色" in st.session_state.allow_yaku, help = "全是黑牌(248饼和风牌)"):
+                    if "黑一色" not in st.session_state.allow_yaku:
+                        st.session_state.allow_yaku.append("黑一色")
+                else:
+                    if "黑一色" in st.session_state.allow_yaku:
+                        st.session_state.allow_yaku.remove("黑一色")
+
             if st.button(["保存","Save"][lan]):
                 st.rerun()
             if st.button(["重置设置","Reset"][lan]):
@@ -2366,6 +2458,13 @@ if page == 3:
         else:
             return [False, -1]
     if st.button(["计算","Calculate"][lan]):
+        dora_list = {"1s": "2s", "2s": "3s", "3s": "4s", "4s": "5s", "5s": "6s", "0s": "6s", "6s": "7s", "7s": "8s",
+                "8s": "9s", "9s": "1s",
+                "1p": "2p", "2p": "3p", "3p": "4p", "4p": "5p", "5p": "6p", "0p": "6p", "6p": "7p", "7p": "8p",
+                "8p": "9p", "9p": "1p",
+                "1m": "2m", "2m": "3m", "3m": "4m", "4m": "5m", "5m": "6m", "0m": "6m", "6m": "7m", "7m": "8m",
+                "8m": "9m", "9m": "1m",
+                "1z": "2z", "2z": "3z", "3z": "4z", "4z": "1z", "5z": "6z", "6z": "7z", "7z": "5z", "8z": "8z"}
         if tenpai_fanfu == False:
             try:
             #if True:
@@ -2442,6 +2541,10 @@ if page == 3:
             #if True:
                 tenpai_check = False
                 tenpai_tiles_hand_meld = re.findall(r"[0-9][mpsz]", tenpai_hand)
+                if len(tenpai_tiles_hand_meld) == 14:
+                    raise Exception
+                if len(tenpai_tiles_hand_meld) == 13 and "w" in tenpai_hand:
+                    raise Exception
                 tenpai_input1 = ","
                 for tenpai_meld in [tenpai_meld1, tenpai_meld2, tenpai_meld3, tenpai_meld4]:
                     if tenpai_meld:
