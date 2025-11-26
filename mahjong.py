@@ -351,6 +351,16 @@ def cal_han(cal_han_user_input, cal_double, cal_lan, cal_output, cal_allow_mode)
         yakuman.append([])
         yakuman_han.append(0)
 
+        total_all_meld = []
+        if total_tile[0] == "M":
+            for meld in total_tile[1][:-1]:
+                total_all_meld.append(meld[0:6])
+            for meld in total_tile[2]:
+                total_all_meld.append(meld[0:6])
+        else:
+            for meld in total_tile[1]:
+                total_all_meld.append(meld[0:6])
+
         # 天和
         if info[4] == "1" and menzen and len(raw_total_tile) == 14 and info[0] == "1":
             if "天和" in st.session_state.allow_yaku or cal_allow_mode:
@@ -548,6 +558,30 @@ def cal_han(cal_han_user_input, cal_double, cal_lan, cal_output, cal_allow_mode)
                 yakuman[index].append(["黑一色", "役满"])
                 yakuman_han[index] += 1
 
+        # 红孔雀
+        redkongque_check = True
+        for tile in raw_total_tile:
+            if tile not in ["1s","5s","7s","9s","7z"]:
+                redkongque_check = False
+        if redkongque_check:
+            if "红孔雀" in st.session_state.allow_yaku and cal_allow_mode != 1:
+                yakuman[index].append(["红孔雀", "役满"])
+                yakuman_han[index] += 1
+
+        #四连刻
+        silianke_check = False
+        silianke_check_ke = []
+        silianke_check_se = []
+        for meld in total_all_meld:
+            if meld[0:2] == meld[2:4]:
+                silianke_check_ke.append(int(meld[0]))
+                silianke_check_se.append(meld[1])
+        if silianke_check_se.count("m") >= 4 or silianke_check_se.count("s") >= 4 or silianke_check_se.count("p") >= 4:
+            if silianke_check_ke in [[1,2,3,4],[2,3,4,5],[3,4,5,6],[4,5,6,7],[5,6,7,8],[6,7,8,9]]:
+                if "四连刻" in st.session_state.allow_yaku and cal_allow_mode != 1:
+                    yakuman[index].append(["四连刻", "役满"])
+                    yakuman_han[index] += 1
+
     if cal_lan == 0:
         chinese_number = {1: "一", 2: "双", 3: "三", 4: "四", 5: "五", 6: "六", 7: "七", 8: "八", 9: "九"}
     else:
@@ -567,7 +601,7 @@ def cal_han(cal_han_user_input, cal_double, cal_lan, cal_output, cal_allow_mode)
                            "四杠子": "Suu Kantsu", "天和": "Tenho", "地和": "Chiho", "役满": "Yakuman",
                            "双倍役满": "Double Yakuman", "大七星": "Dai Shichisei", "大竹林": "Dai Chikurin", 
                            "大车轮": "Dai Sharin", "大数邻": "Dai Kazurin", "石上三年": "Ishino Uenimo San Nen",
-                           "黑一色": "Kuro Iiso"}
+                           "黑一色": "Kuro Iiso", "红孔雀": "Beni Kujaku", "四连刻": "Shi Renko"}
             if len(yakuman[max_index]) > 1:
                 for yaku in yakuman[max_index]:
                     #print(yaku[0] + " " + yaku[1])
@@ -940,24 +974,24 @@ def cal_han(cal_han_user_input, cal_double, cal_lan, cal_output, cal_allow_mode)
         # 三色同顺
         sanshokudoujun = False
         if "1m2m3m" in total_all_meld and "1p2p3p" in total_all_meld and "1s2s3s" in total_all_meld:
-            sanshokudoukou = True
+            sanshokudoujun = True
         elif "2m3m4m" in total_all_meld and "2p3p4p" in total_all_meld and "2s3s4s" in total_all_meld:
-            sanshokudoukou = True
+            sanshokudoujun = True
         elif "3m4m5m" in total_all_meld and "3p4p5p" in total_all_meld and "3s4s5s" in total_all_meld:
-            sanshokudoukou = True
+            sanshokudoujun = True
         elif "4m5m6m" in total_all_meld and "4p5p6p" in total_all_meld and "4s5s6s" in total_all_meld:
-            sanshokudoukou = True
+            sanshokudoujun = True
         elif "5m6m7m" in total_all_meld and "5p6p7p" in total_all_meld and "5s6s7s" in total_all_meld:
-            sanshokudoukou = True
+            sanshokudoujun = True
         elif "6m7m8m" in total_all_meld and "6p7p8p" in total_all_meld and "6s7s8s" in total_all_meld:
-            sanshokudoukou = True
+            sanshokudoujun = True
         elif "7m8m9m" in total_all_meld and "7p8p9p" in total_all_meld and "7s8s9s" in total_all_meld:
-            sanshokudoukou = True
-        if sanshokudoukou and not menzen:
+            sanshokudoujun = True
+        if sanshokudoujun and not menzen:
             if "三色同顺" in st.session_state.allow_yaku or cal_allow_mode:
                 non_yakuman[index].append(["三色同顺", "1番"])
                 non_yakuman_han[index] += 1
-        elif sanshokudoukou and menzen:
+        elif sanshokudoujun and menzen:
             if "三色同顺" in st.session_state.allow_yaku or cal_allow_mode:
                 non_yakuman[index].append(["三色同顺", "2番"])
                 non_yakuman_han[index] += 2
@@ -1708,6 +1742,13 @@ if page == 1:
                 else:
                     if "石上三年" in st.session_state.allow_yaku:
                         st.session_state.allow_yaku.remove("石上三年")
+                # 四连刻
+                if st.toggle("四连刻", value = "四连刻" in st.session_state.allow_yaku, help = "同种数牌连续数字的四个刻子"):
+                    if "四连刻" not in st.session_state.allow_yaku:
+                        st.session_state.allow_yaku.append("四连刻")
+                else:
+                    if "四连刻" in st.session_state.allow_yaku:
+                        st.session_state.allow_yaku.remove("四连刻")
                 # 黑一色
                 if st.toggle("黑一色", value = "黑一色" in st.session_state.allow_yaku, help = "全是黑牌(248饼和风牌)"):
                     if "黑一色" not in st.session_state.allow_yaku:
@@ -1715,6 +1756,13 @@ if page == 1:
                 else:
                     if "黑一色" in st.session_state.allow_yaku:
                         st.session_state.allow_yaku.remove("黑一色")
+                # 红孔雀
+                if st.toggle("红孔雀", value = "红孔雀" in st.session_state.allow_yaku, help = "只包含1579索和中"):
+                    if "红孔雀" not in st.session_state.allow_yaku:
+                        st.session_state.allow_yaku.append("红孔雀")
+                else:
+                    if "红孔雀" in st.session_state.allow_yaku:
+                        st.session_state.allow_yaku.remove("红孔雀")
 
             if st.button(["保存","Save"][lan]):
                 st.rerun()
@@ -1786,6 +1834,7 @@ if page == 1:
             ipt10 = ipt910_tran[ipt10]
     ipt11 = st.session_state.double_yakuman_open
     try:
+    #if True:
         cal_ipt = ""
         cal_ipt += ipt1
         cal_ipt += ","
