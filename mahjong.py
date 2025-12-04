@@ -4,6 +4,13 @@ import streamlit as st
 import random
 
 
+def nobadword(nbw_str):
+    badword = ["nigga","nigger","niga","niger","jimmy","jim","鸡鸡","鸡巴","傻逼","ass","fuck","黑鬼","变态","jack","67","bitch"]
+    pattern = re.compile(r"(" + "|".join(badword) + r")", re.IGNORECASE)
+    nbw_str = pattern.sub("❤", nbw_str)
+    nbw_str = re.sub(r"(\❤\s*)+", "❤", nbw_str)
+    return nbw_str
+
 def sim_meld(sim_meld_input):
     s_letter = ""
     for sim_letter in ["s","z","m","p"]:
@@ -1977,8 +1984,9 @@ elif page == 2:
             with col51:
                 insert_player = st.chat_input(["添加玩家","Insert Player"][lan])
                 if insert_player and insert_player not in st.session_state.player_list4 and len(st.session_state.player_list4) <= 4: 
-                    insert_player = insert_player[0:6]
-                    st.session_state.player_list4.append(insert_player)
+                    insert_player = nobadword(insert_player)[0:8]
+                    if insert_player.count(" ") != len(insert_player):
+                        st.session_state.player_list4.append(insert_player)
             with col52:
                 if st.button(["移除玩家","Remove Player"][lan]):
                     try:
@@ -2207,8 +2215,9 @@ elif page == 2:
             col351, col352 = st.columns([4, 1])
             with col351:
                 insert_player_3 = st.chat_input(["添加玩家", "Insert Player"][lan],key="30")
-                if insert_player_3 and insert_player_3 not in st.session_state.player_list3 and len(
-                        st.session_state.player_list3) <= 3: st.session_state.player_list3.append(insert_player_3)
+                if insert_player_3 and insert_player_3 not in st.session_state.player_list3 and len(st.session_state.player_list3) <= 3: 
+                    insert_player_3 = nobadword(insert_player_3)[0:8]
+                    st.session_state.player_list3.append(insert_player_3)
             with col352:
                 if st.button(["移除玩家", "Remove Player"][lan],key="31"):
                     try:
