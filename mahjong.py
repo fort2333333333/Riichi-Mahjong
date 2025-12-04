@@ -2451,6 +2451,9 @@ if page == 5:
     form_url = "https://docs.google.com/forms/d/e/1FAIpQLSe4clzw2E6KzdOirVOOGV6mSTG0S_XC9KdmKhb4QnnOwohUKg/viewform?usp=dialog"
     st.markdown(f'<a href="{form_url}" target="_blank">{["提交反馈","Report Issues Or Give Feedback"][lan]}</a>',
                 unsafe_allow_html=True)
+    form_url2 = "https://docs.google.com/forms/d/e/1FAIpQLSdntZn5kiay5h0rfp5rAHmw5yixLWebDewznqtiONY5SqJ_pA/viewform?usp=dialog"
+    st.markdown(f'<a href="{form_url2}" target="_blank">{["满意度调查","Satisfaction Survey"][lan]}</a>',
+                unsafe_allow_html=True)
 if page == 3:
     TENPAI_ALL_TILE = ["1m","2m","3m","4m","5m","6m","7m","8m","9m",
                     "1s","2s","3s","4s","5s","6s","7s","8s","9s",
