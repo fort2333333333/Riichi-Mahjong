@@ -1976,8 +1976,9 @@ elif page == 2:
             col51, col52 = st.columns([4,1])
             with col51:
                 insert_player = st.chat_input(["添加玩家","Insert Player"][lan])
-                if insert_player and insert_player not in st.session_state.player_list4 and len(
-                        st.session_state.player_list4) <= 4: st.session_state.player_list4.append(insert_player)
+                if insert_player and insert_player not in st.session_state.player_list4 and len(st.session_state.player_list4) <= 4: 
+                    insert_player = insert_player[0:6]
+                    st.session_state.player_list4.append(insert_player)
             with col52:
                 if st.button(["移除玩家","Remove Player"][lan]):
                     try:
