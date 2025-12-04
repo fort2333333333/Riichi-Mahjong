@@ -5,10 +5,10 @@ import random
 
 
 def nobadword(nbw_str):
-    badword = ["nigga","nigger","niga","niger","jimmy","jim","鸡鸡","鸡巴","傻逼","ass","fuck","黑鬼","变态","jack","67","bitch"]
-    pattern = re.compile(r"(" + "|".join(badword) + r")", re.IGNORECASE)
-    nbw_str = pattern.sub("❤", nbw_str)
-    nbw_str = re.sub(r"(\❤\s*)+", "❤", nbw_str)
+    #badword = []
+    #pattern = re.compile(r"(" + "|".join(badword) + r")", re.IGNORECASE)
+    #nbw_str = pattern.sub("❤", nbw_str)
+    #nbw_str = re.sub(r"(\❤\s*)+", "❤", nbw_str)
     return nbw_str
 
 def sim_meld(sim_meld_input):
