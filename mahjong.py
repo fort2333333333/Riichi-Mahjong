@@ -2664,6 +2664,7 @@ if page == 3:
                 st.error(["请检查输入", "Please Check Your Input"][lan])
 
 if page == 4:
+    st.subheader(["此功能用于生成13张清一色听牌用于算听练习","This Function is Used to Generating 13 Chinitsu Tenpai for Tenpai Calculation Practise"][lan])
     QING_ALL_TILE = ["1s", "2s", "3s", "4s", "5s", "6s", "7s", "8s", "9s",
                      "1s", "2s", "3s", "4s", "5s", "6s", "7s", "8s", "9s",
                      "1s", "2s", "3s", "4s", "5s", "6s", "7s", "8s", "9s",
@@ -2680,7 +2681,7 @@ if page == 4:
         qing_type = "s"
     elif qing_type == "万字" or qing_type == "Manzu":
         qing_type = "m"
-    if st.button(["生成新的 (最小听牌数越多生成耗时越久，请耐心等待(屎山代码发力了))", "Generate A New Hand (Might Take A While If Minimum Tenpai Number Is High)"][lan]):
+    if st.button(["生成", "Generate"][lan]):
         while True:
             random.shuffle(QING_ALL_TILE)
             qing_hand = sorted(QING_ALL_TILE[0:13])
