@@ -60,7 +60,7 @@ def meld_check(meld_check_meld):
         return False
 
 
-def cal_han(cal_han_user_input, cal_double, cal_lan, cal_output, cal_allow_mode):
+def cal_han(cal_han_user_input, cal_double, cal_lan, cal_output, cal_allow_mode, old_info):
     st_han_output = ""
     if cal_lan == 0:
         ron_tsumo = {"0": "和", "1": "自摸"}
@@ -380,6 +380,12 @@ def cal_han(cal_han_user_input, cal_double, cal_lan, cal_output, cal_allow_mode)
                 yakuman[index].append(["地和", "役满"])
                 yakuman_han[index] += 1
 
+        # 人和
+        if "人和" in old_info and menzen and len(raw_total_tile) == 14 and info[0] == "0":
+            if "人和" in st.session_state.allow_yaku and cal_allow_mode != 1:
+                yakuman[index].append(["人和", "役满"])
+                yakuman_han[index] += 1
+
         # 大三元
         if raw_total_tile.count("5z") >= 3 and raw_total_tile.count("6z") >= 3 and raw_total_tile.count("7z") >= 3:
             if "大三元" in st.session_state.allow_yaku or cal_allow_mode:
@@ -575,6 +581,32 @@ def cal_han(cal_han_user_input, cal_double, cal_lan, cal_output, cal_allow_mode)
                 yakuman[index].append(["红孔雀", "役满"])
                 yakuman_han[index] += 1
 
+        # 五福临门
+        wufulinmen_check = True
+        wumenqi_check = False
+        wufulinmen_check1 = []
+        for tile in raw_total_tile:
+            if tile[1] == "s":
+                wufulinmen_check1.append("s")
+            elif tile[1] == "m":
+                wufulinmen_check1.append("m")
+            elif tile[1] == "p":
+                wufulinmen_check1.append("p")
+            elif tile in ["1z","2z","3z","4z"]:
+                wufulinmen_check1.append("1z")
+            elif tile in ["4z","5z","6z"]:
+                wufulinmen_check1.append("5z")
+        if len(set(wufulinmen_check1)) != 5:
+            wufulinmen_check = False
+        else:
+            wumenqi_check = True
+        if total_tile[0] == "M" and menzen and wumenqi_check:
+            if total_all_meld[0][0:2] == total_all_meld[0][2:4] and total_all_meld[1][0:2] == total_all_meld[1][2:4]:
+                if total_all_meld[2][0:2] == total_all_meld[2][2:4] and total_all_meld[3][0:2] == total_all_meld[3][2:4]:
+                    if "五福临门" in st.session_state.allow_yaku and cal_allow_mode != 1:
+                        yakuman[index].append(["五福临门", "役满"])
+                        yakuman_han[index] += 1
+
         #四连刻
         silianke_check = False
         silianke_check_ke = []
@@ -608,7 +640,8 @@ def cal_han(cal_han_user_input, cal_double, cal_lan, cal_output, cal_allow_mode)
                            "四杠子": "Suu Kantsu", "天和": "Tenho", "地和": "Chiho", "役满": "Yakuman",
                            "双倍役满": "Double Yakuman", "大七星": "Dai Shichisei", "大竹林": "Dai Chikurin", 
                            "大车轮": "Dai Sharin", "大数邻": "Dai Kazurin", "石上三年": "Ishino Uenimo San Nen",
-                           "黑一色": "Kuro Iiso", "红孔雀": "Beni Kujaku", "四连刻": "Shi Renko"}
+                           "黑一色": "Kuro Iiso", "红孔雀": "Beni Kujaku", "四连刻": "Shi Renko", "人和": "Renhou",
+                            "五福临门": "Gozoku Kyowa"}
             if len(yakuman[max_index]) > 1:
                 for yaku in yakuman[max_index]:
                     #print(yaku[0] + " " + yaku[1])
@@ -1714,6 +1747,13 @@ if page == 1:
                     if "混一色" in st.session_state.allow_yaku:
                         st.session_state.allow_yaku.remove("混一色")
             with set_old_yaku:
+                # 人和
+                if st.toggle("人和", value = "人和" in st.session_state.allow_yaku, help = "无人鸣牌时闲家摸第一张牌前荣和"):
+                    if "人和" not in st.session_state.allow_yaku:
+                        st.session_state.allow_yaku.append("人和")
+                else:
+                    if "人和" in st.session_state.allow_yaku:
+                        st.session_state.allow_yaku.remove("人和")
                 # 大七星
                 if st.toggle("大七星", value = "大七星" in st.session_state.allow_yaku, help = "七种字牌组成的七对子"):
                     if "大七星" not in st.session_state.allow_yaku:
@@ -1770,6 +1810,13 @@ if page == 1:
                 else:
                     if "红孔雀" in st.session_state.allow_yaku:
                         st.session_state.allow_yaku.remove("红孔雀")
+                # 五福临门
+                if st.toggle("五福临门", value = "五福临门" in st.session_state.allow_yaku, help = "四组刻子组成的门前清五门齐"):
+                    if "五福临门" not in st.session_state.allow_yaku:
+                        st.session_state.allow_yaku.append("五福临门")
+                else:
+                    if "五福临门" in st.session_state.allow_yaku:
+                        st.session_state.allow_yaku.remove("五福临门")
 
             if st.button(["保存","Save"][lan]):
                 st.rerun()
@@ -1815,10 +1862,11 @@ if page == 1:
         ipt6 = "自摸"
     elif ipt6 == "Ron":
         ipt6 = "荣"
-    ipt7 = st.multiselect(f"{["和牌状态", "Winning Conditions"][lan]}",[["立直","双立直","一发","枪杠","岭上开花","天和","地和","海底"],["Riichi", "Daburu Riichi", "Ippatsu", "Chankan", "Rinshan Kaiho", "Tenho", "Chiho", "Haitei"]][lan])
+    ipt7 = st.multiselect(f"{["和牌状态", "Winning Conditions"][lan]}",[["立直","双立直","一发","枪杠","岭上开花","天和","地和","海底","人和"],["Riichi", "Daburu Riichi", "Ippatsu", "Chankan", "Rinshan Kaiho", "Tenho", "Chiho", "Haitei","Renhou"]][lan])
     if lan == 1:
         ipt7_tran = {"Riichi": "立直", "Daburu Riichi": "双立直", "Ippatsu": "一发", "Chankan": "枪杠",
-                         "Rinshan Kaiho": "岭上开花", "Tenho": "天和", "Chiho": "地和", "Haitei": "海底"}
+                         "Rinshan Kaiho": "岭上开花", "Tenho": "天和", "Chiho": "地和", "Haitei": "海底",
+                         "Renhou": "人和"}
         ipt7_chn = []
         for eng in ipt7:
             ipt7_chn.append(ipt7_tran[eng])
@@ -1894,6 +1942,10 @@ if page == 1:
         else:
             cal_ipt += "0,"
 
+        cal_ipt_old = []
+        if "人和" in ipt7:
+            cal_ipt_old.append("人和")
+
         dora_list = {"1s": "2s", "2s": "3s", "3s": "4s", "4s": "5s", "5s": "6s", "0s": "6s", "6s": "7s", "7s": "8s",
                 "8s": "9s", "9s": "1s",
                 "1p": "2p", "2p": "3p", "3p": "4p", "4p": "5p", "5p": "6p", "0p": "6p", "6p": "7p", "7p": "8p",
@@ -1911,7 +1963,7 @@ if page == 1:
         cal_ipt += {"东":"1z","南":"2z","西":"3z","北":"4z"}[ipt10]
 
         if "w" not in ipt1:
-            cal_han(cal_ipt, ipt11, lan, True, 0)
+            cal_han(cal_ipt, ipt11, lan, True, 0, cal_ipt_old)
         else:
             ALL_W_TILE = ["1m","2m","3m","4m","5m","6m","7m","8m","9m",
                     "1s","2s","3s","4s","5s","6s","7s","8s","9s",
@@ -1920,12 +1972,12 @@ if page == 1:
             cal_ipt.replace("w","")
             w_han_list = []
             for w_tile in ALL_W_TILE:
-                w_han_list.append(cal_han(w_tile + cal_ipt, ipt11, lan, False, 0)[1])
+                w_han_list.append(cal_han(w_tile + cal_ipt, ipt11, lan, False, 0, cal_ipt_old)[1])
             w_max_index = w_han_list.index(max(w_han_list))
             cal_ipt = ALL_W_TILE[w_max_index] + cal_ipt
             if max(w_han_list) != -1:
                 st.text([f"万象牌是{ALL_W_TILE[w_max_index]}",f"Wild Card Is {ALL_W_TILE[w_max_index]}"][lan])
-            cal_han(cal_ipt, ipt11, lan, True, 0)
+            cal_han(cal_ipt, ipt11, lan, True, 0, cal_ipt_old)
 
     except Exception:
         st.text(["计算结果会自动输出，若无输出请重新检查输入 AwA","Results are generated automatically. If nothing appears, please double-check your input AwA"][lan])
@@ -2509,14 +2561,14 @@ if page == 3:
         w_cal_ipt.replace("w", "")
         w_w_han_list = []
         for w_tile in ALL_WW_TILE:
-            w_cal_han_result = cal_han(w_tile + w_cal_ipt, w_ipt11, lan, False, 1)[1]
+            w_cal_han_result = cal_han(w_tile + w_cal_ipt, w_ipt11, lan, False, 1, [])[1]
             w_w_han_list.append(w_cal_han_result)
             if fast and w_cal_han_result != -1:
                return [True,1]
         w_max_index = w_w_han_list.index(max(w_w_han_list))
         w_cal_ipt = ALL_WW_TILE[w_max_index] + w_cal_ipt
         if max(w_w_han_list) != -1:
-            return cal_han(w_cal_ipt, w_ipt11, lan, False, 1)
+            return cal_han(w_cal_ipt, w_ipt11, lan, False, 1, [])
         else:
             return [False, -1]
     if st.button(["计算","Calculate"][lan]):
@@ -2584,7 +2636,7 @@ if page == 3:
                     tenpai_count = False
                     for tile in TENPAI_ALL_TILE:
                         tenpai_input = f"{tenpai_hand}{tile},{tenpai_meld},00000,,1z1z"
-                        if cal_han(tenpai_input, True, 0, False, 1)[0]:
+                        if cal_han(tenpai_input, True, 0, False, 1, [])[0]:
                             if re.findall(r"[0-9][mpsz]", tenpai_hand).count(tile) >= 4:
                                 if tenpai_ignore:
                                     pass
@@ -2634,7 +2686,7 @@ if page == 3:
                         if "w" in tenpai_hand:
                             tenpai_cal_han_output = w_cal_han(tenpai_input3, tenpai_double_yakuman, False)[0]
                         else:
-                            tenpai_cal_han_output = cal_han(tenpai_input3, tenpai_double_yakuman, lan, False, 1)[0]
+                            tenpai_cal_han_output = cal_han(tenpai_input3, tenpai_double_yakuman, lan, False, 1, [])[0]
                         if tenpai_cal_han_output:
                             if tenpai_tr == "0":
                                 tenpai_st_output += f"( {["荣", "Ron"][lan]}: {tenpai_cal_han_output} / "
@@ -2688,7 +2740,7 @@ if page == 4:
             qing_ten = []
             for tile in ["1s", "2s", "3s", "4s", "5s", "6s", "7s", "8s", "9s"]:
                 cal_han_input_qing = f"{"".join(qing_hand)}{tile},,00000,,1z1z"
-                if cal_han(cal_han_input_qing, True, 0, False, 1)[0]:
+                if cal_han(cal_han_input_qing, True, 0, False, 1, [])[0]:
                     if qing_hand.count(tile) != 4:
                         qing_ten.append(tile)
             if len(qing_ten) >= minimum_tenpai:
