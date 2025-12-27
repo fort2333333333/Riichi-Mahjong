@@ -2133,9 +2133,9 @@ if page == 1:
         cal_ipt += {"东":"1z","南":"2z","西":"3z","北":"4z"}[ipt10]
 
         if "w" not in ipt1:
+            cal_han(cal_ipt, ipt11, lan, True, 0, cal_ipt_old)
             if jingaoxiaoxi:
                 st.text(jingaoxiaoxi)
-            cal_han(cal_ipt, ipt11, lan, True, 0, cal_ipt_old)
         else:
             ALL_W_TILE = ["1m","2m","3m","4m","5m","6m","7m","8m","9m",
                     "1s","2s","3s","4s","5s","6s","7s","8s","9s",
@@ -2149,8 +2149,9 @@ if page == 1:
             cal_ipt = ALL_W_TILE[w_max_index] + cal_ipt
             if max(w_han_list) != -1:
                 st.text([f"万象牌是{ALL_W_TILE[w_max_index]}",f"Wild Card Is {ALL_W_TILE[w_max_index]}"][lan])
-            st.text(jingaoxiaoxi)
             cal_han(cal_ipt, ipt11, lan, True, 0, cal_ipt_old)
+            if jingaoxiaoxi:
+                st.text(jingaoxiaoxi)
 
     except Exception:
         st.text(["计算结果会自动输出，若无输出请重新检查输入 AwA","Results are generated automatically. If nothing appears, please double-check your input AwA"][lan])
