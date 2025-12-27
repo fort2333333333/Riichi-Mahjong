@@ -2052,7 +2052,7 @@ if page == 1:
             if ipt_all_tiles.count(pai) > 4:
                 jingaoxiaoxi += f"警告：发现了{ipt_all_tiles.count(pai)}张{pai}\n"
     except Exception as e:
-        st.text(e)
+        pass
     try:
     #if True:
     
@@ -2133,10 +2133,13 @@ if page == 1:
         cal_ipt += {"东":"1z","南":"2z","西":"3z","北":"4z"}[ipt10]
 
         if "w" not in ipt1:
+            jingao = st.empty()
             cal_han(cal_ipt, ipt11, lan, True, 0, cal_ipt_old)
-            if jingaoxiaoxi:
-                st.text(jingaoxiaoxi)
+            with jingao:
+                if jingaoxiaoxi:
+                    st.text(jingaoxiaoxi)
         else:
+            jingao2 = st.empty()
             ALL_W_TILE = ["1m","2m","3m","4m","5m","6m","7m","8m","9m",
                     "1s","2s","3s","4s","5s","6s","7s","8s","9s",
                     "1p","2p","3p","4p","5p","6p","7p","8p","9p",
@@ -2150,8 +2153,9 @@ if page == 1:
             if max(w_han_list) != -1:
                 st.text([f"万象牌是{ALL_W_TILE[w_max_index]}",f"Wild Card Is {ALL_W_TILE[w_max_index]}"][lan])
             cal_han(cal_ipt, ipt11, lan, True, 0, cal_ipt_old)
-            if jingaoxiaoxi:
-                st.text(jingaoxiaoxi)
+            with jingao2:
+                if jingaoxiaoxi:
+                    st.text(jingaoxiaoxi)
 
     except Exception:
         st.text(["计算结果会自动输出，若无输出请重新检查输入 AwA","Results are generated automatically. If nothing appears, please double-check your input AwA"][lan])
@@ -2746,6 +2750,7 @@ if page == 3:
         else:
             return [False, -1]
     if st.button(["计算","Calculate"][lan]):
+        cal_ipt_old = []
         dora_list = {"1s": "2s", "2s": "3s", "3s": "4s", "4s": "5s", "5s": "6s", "0s": "6s", "6s": "7s", "7s": "8s",
                 "8s": "9s", "9s": "1s",
                 "1p": "2p", "2p": "3p", "3p": "4p", "4p": "5p", "5p": "6p", "0p": "6p", "6p": "7p", "7p": "8p",
@@ -2908,6 +2913,7 @@ if page == 4:
     elif qing_type == "万字" or qing_type == "Manzu":
         qing_type = "m"
     if st.button(["生成", "Generate"][lan]):
+        cal_ipt_old = []
         while True:
             random.shuffle(QING_ALL_TILE)
             qing_hand = sorted(QING_ALL_TILE[0:13])
