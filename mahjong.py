@@ -2042,7 +2042,20 @@ if page == 1:
             ipt10 = ipt910_tran[ipt10]
     ipt11 = st.session_state.double_yakuman_open
     try:
+        jingaoxiaoxi = ""
+        ipt_all_tiles = re.findall(r"[0-9][mpsz]", ipt1+ipt2+ipt3+ipt4+ipt5+ipt8+"7z"*ipt12)
+        SUOYOUPAI = ["1m","2m","3m","4m","5m","6m","7m","8m","9m",
+                    "1s","2s","3s","4s","5s","6s","7s","8s","9s",
+                    "1p","2p","3p","4p","5p","6p","7p","8p","9p",
+                    "1z","2z","3z","4z","5z","6z","7z"]
+        for pai in SUOYOUPAI:
+            if ipt_all_tiles.count(pai) > 4:
+                jingaoxiaoxi += f"警告：发现了{ipt_all_tiles.count(pai)}张{pai}\n"
+    except Exception as e:
+        st.text(e)
+    try:
     #if True:
+    
         cal_ipt = ""
         cal_ipt += ipt1
         cal_ipt += ","
@@ -2120,6 +2133,8 @@ if page == 1:
         cal_ipt += {"东":"1z","南":"2z","西":"3z","北":"4z"}[ipt10]
 
         if "w" not in ipt1:
+            if jingaoxiaoxi:
+                st.text(jingaoxiaoxi)
             cal_han(cal_ipt, ipt11, lan, True, 0, cal_ipt_old)
         else:
             ALL_W_TILE = ["1m","2m","3m","4m","5m","6m","7m","8m","9m",
@@ -2134,6 +2149,7 @@ if page == 1:
             cal_ipt = ALL_W_TILE[w_max_index] + cal_ipt
             if max(w_han_list) != -1:
                 st.text([f"万象牌是{ALL_W_TILE[w_max_index]}",f"Wild Card Is {ALL_W_TILE[w_max_index]}"][lan])
+            st.text(jingaoxiaoxi)
             cal_han(cal_ipt, ipt11, lan, True, 0, cal_ipt_old)
 
     except Exception:
