@@ -831,7 +831,7 @@ def cal_han(cal_han_user_input, cal_double, cal_lan, cal_output, cal_allow_mode,
             non_yakuman_judge.append("岭上开花")
 
         # 一发
-        if "岭上开花" not in non_yakuman_judge and info[1] != "0" and info[2] == "1" and menzen:
+        if "岭上开花" not in non_yakuman_judge and info[1] != "0" and info[2] == "1" and menzen and "杠振" not in cal_ipt_old:
             if "一发" in st.session_state.allow_yaku or cal_allow_mode:
                 non_yakuman[index].append(["一发", "1番"])
                 non_yakuman_han[index] += 1
@@ -1132,6 +1132,24 @@ def cal_han(cal_han_user_input, cal_double, cal_lan, cal_output, cal_allow_mode,
             if "三连刻" in st.session_state.allow_yaku and cal_allow_mode != 1:
                 non_yakuman[index].append(["三连刻", "2番"])
                 non_yakuman_han[index] += 2
+        
+        # 十二落胎
+        if len(all_total_tile[index][2]) == 4:
+            if "十二落抬" in st.session_state.allow_yaku and cal_allow_mode != 1:
+                non_yakuman[index].append(["十二落抬", "1番"])
+                non_yakuman_han[index] += 1
+
+        # 燕返
+        if info[0] == "0" and "燕返" in cal_ipt_old and "枪杠" not in non_yakuman_judge:
+            if "燕返" in st.session_state.allow_yaku and cal_allow_mode != 1:
+                non_yakuman[index].append(["燕返", "1番"])
+                non_yakuman_han[index] += 1
+        
+        # 杠振
+        if info[0] == "0" and "杠振" in cal_ipt_old and "枪杠" not in non_yakuman_judge:
+            if "杠振" in st.session_state.allow_yaku and cal_allow_mode != 1:
+                non_yakuman[index].append(["杠振", "1番"])
+                non_yakuman_han[index] += 1
 
         # 宝牌/里宝牌
         if non_yakuman_han[index] != 0:
@@ -1919,6 +1937,27 @@ if page == 1:
                 else:
                     if "三连刻" in st.session_state.allow_yaku:
                         st.session_state.allow_yaku.remove("三连刻")
+                # 十二落抬
+                if st.toggle("十二落抬", value = "十二落抬" in st.session_state.allow_yaku, help = "四副露"):
+                    if "十二落抬" not in st.session_state.allow_yaku:
+                        st.session_state.allow_yaku.append("十二落抬")
+                else:
+                    if "十二落抬" in st.session_state.allow_yaku:
+                        st.session_state.allow_yaku.remove("十二落抬")
+                # 燕返
+                if st.toggle("燕返", value = "燕返" in st.session_state.allow_yaku, help = "荣别家第一张立直宣言牌"):
+                    if "燕返" not in st.session_state.allow_yaku:
+                        st.session_state.allow_yaku.append("燕返")
+                else:
+                    if "燕返" in st.session_state.allow_yaku:
+                        st.session_state.allow_yaku.remove("燕返")
+                # 杠振
+                if st.toggle("杠振", value = "杠振" in st.session_state.allow_yaku, help = "荣别家杠完第一张舍牌"):
+                    if "杠振" not in st.session_state.allow_yaku:
+                        st.session_state.allow_yaku.append("杠振")
+                else:
+                    if "杠振" in st.session_state.allow_yaku:
+                        st.session_state.allow_yaku.remove("杠振")
                 # 四连刻
                 if st.toggle("四连刻", value = "四连刻" in st.session_state.allow_yaku, help = "同种数牌连续数字的四个刻子"):
                     if "四连刻" not in st.session_state.allow_yaku:
@@ -1976,11 +2015,11 @@ if page == 1:
         ipt6 = "自摸"
     elif ipt6 == "Ron":
         ipt6 = "荣"
-    ipt7 = st.multiselect(f"{["和牌状态", "Winning Conditions"][lan]}",[["立直","双立直","一发","枪杠","岭上开花","天和","地和","海底","人和"],["Riichi", "Daburu Riichi", "Ippatsu", "Chankan", "Rinshan Kaiho", "Tenho", "Chiho", "Haitei","Renhou"]][lan])
+    ipt7 = st.multiselect(f"{["和牌状态", "Winning Conditions"][lan]}",[["立直","双立直","一发","枪杠","岭上开花","海底","燕返","杠振","天和","地和","人和"],["Riichi", "Daburu Riichi", "Ippatsu", "Chankan", "Rinshan Kaiho", "Haitei", "Tsubamegaeshi", "Kanburi", "Tenho", "Chiho", "Renhou"]][lan])
     if lan == 1:
         ipt7_tran = {"Riichi": "立直", "Daburu Riichi": "双立直", "Ippatsu": "一发", "Chankan": "枪杠",
                          "Rinshan Kaiho": "岭上开花", "Tenho": "天和", "Chiho": "地和", "Haitei": "海底",
-                         "Renhou": "人和"}
+                         "Renhou": "人和", "Tsubamegaeshi": "燕返", "Kanburi": "杠振"}
         ipt7_chn = []
         for eng in ipt7:
             ipt7_chn.append(ipt7_tran[eng])
@@ -2059,6 +2098,10 @@ if page == 1:
         cal_ipt_old = []
         if "人和" in ipt7:
             cal_ipt_old.append("人和")
+        if "燕返" in ipt7:
+            cal_ipt_old.append("燕返")
+        if "杠振" in ipt7:
+            cal_ipt_old.append("杠振")
 
         dora_list = {"1s": "2s", "2s": "3s", "3s": "4s", "4s": "5s", "5s": "6s", "0s": "6s", "6s": "7s", "7s": "8s",
                 "8s": "9s", "9s": "1s",
