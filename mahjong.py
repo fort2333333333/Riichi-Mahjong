@@ -51,7 +51,7 @@ def meld_check(meld_check_meld):
             return True
         else:
             return False
-    elif len(meld_check_meld) == 5:
+    elif len(meld_check_meld) >= 5:
         if meld_check_meld[0] == meld_check_meld[1] == meld_check_meld[2] == meld_check_meld[3] and meld_check_meld[4] == "a":
             return True
         else:
@@ -141,7 +141,7 @@ def cal_han(cal_han_user_input, cal_double, cal_lan, cal_output, cal_allow_mode,
     # 处理hand(手牌):使用list存储手牌里每张牌
     hand = re.findall(r"[0-9][mpsz]", hand)
     for index, tile in enumerate(hand):
-        if tile[0] == "0":
+        if tile in ["0m","0s","0p"]:
             hand[index] = "5" + tile[1]
             red_dora.append(tile)
     ron_tsumo_tile = hand[-1]
@@ -281,17 +281,20 @@ def cal_han(cal_han_user_input, cal_double, cal_lan, cal_output, cal_allow_mode,
     else:
         melded = [melded]
     for index, meld in enumerate(melded):
-        if len(meld) == 9:
+        if len(meld) >= 9:
             melded[index] = re.findall(r"[0-9][mpsz]|a", meld)
         else:
             melded[index] = re.findall(r"[0-9][mpsz]", meld)
     for index, meld in enumerate(melded):
         for tile_index, tile in enumerate(meld):
-            if tile[0] == "0":
+            if tile in ["0s","0p","0m"]:
                 melded[index][tile_index] = "5" + tile[1]
                 red_dora.append(tile)
 
     # 处理melded(副露):检查每个面子并存储
+    for index, meld in enumerate(melded):
+        if len(meld) == 4 and "a" in meld:
+            melded[index].remove("a")
     menzen = True
     checked_melded = []
     for meld in melded:
@@ -1168,8 +1171,9 @@ def cal_han(cal_han_user_input, cal_double, cal_lan, cal_output, cal_allow_mode,
     if max(non_yakuman_han) == 0:
         #print("哥么你这牌有役吗")
         if cal_output:
-            for j in range(1):
-                st.error(["哥么你役去哪了？？？","Where Is Your Han Bro???"][cal_lan])
+            print_total(checked_total_tile[0], cal_lan)
+            st.text(["诈和 0番\n0番 0符","False Win - 0 Han\n0 Han  0 Fu"][cal_lan])
+            st.error(["无役","0 Han"][cal_lan])
         return_title = ["无役", "No Yaku"][cal_lan]
         return_title = [return_title,0]
         return return_title
@@ -1484,6 +1488,10 @@ Non-Dealer：Unknown Points"""][lan]
 
 def ful_hand(hand_ipt):
     try:
+        a_check = False
+        while "a" in hand_ipt:
+            hand_ipt = hand_ipt.replace("a","")
+            a_check = True
         new_hand_ipt = ""
         hand_letter_index = []
         for letter in hand_ipt:
@@ -1492,7 +1500,7 @@ def ful_hand(hand_ipt):
             else:
                 hand_letter_index.append("")
         for index, letter in enumerate(hand_ipt):
-            if letter == "a" or letter == "w":
+            if letter == "w":
                 new_hand_ipt += letter
             elif letter not in ["m", "p", "s", "z"] and hand_ipt[index + 1] not in ["m", "p", "s", "z"]:
                 new_hand_ipt += letter
@@ -1502,9 +1510,11 @@ def ful_hand(hand_ipt):
                         break
             else:
                 new_hand_ipt += letter
+        if a_check:
+            new_hand_ipt += "a"
         return new_hand_ipt
     except Exception:
-        return ""
+        return hand_ipt
 
 
 if "allow_yaku" not in st.session_state:
@@ -1558,7 +1568,7 @@ if page == 1:
 
             set_yakuman, set_yaku, set_old_yaku = st.tabs(["役满","一般役","古役"])
             with set_yakuman:
-                st.session_state.double_yakuman_open = st.checkbox(f"{['国士无双十三面，纯正九莲宝灯，四暗刻单骑，大四喜计为双倍役满', 'Kokushi Muso Juusanmen, Junsei Churen Poto, Suu Ankou Tanki, Dai Suushi are double yakuman'][lan]}", value=st.session_state.double_yakuman_open)
+                st.session_state.double_yakuman_open = st.checkbox(f"{['国士无双十三面，纯正九莲宝灯，四暗刻单骑，大四喜计为双倍役满', 'Kokushi Muso Juusanmen, Junsei Churen Poto, Suu Ankou Tanki, Dai Suushi are Double Yakuman'][lan]}", value=st.session_state.double_yakuman_open)
                 # 国士无双
                 if st.toggle("国士无双/国士无双十三面", value = "国士无双" in st.session_state.allow_yaku, help = "所有幺九牌各一张+任意一张幺九牌"):
                     if "国士无双" not in st.session_state.allow_yaku:
@@ -1992,16 +2002,49 @@ if page == 1:
 
         if st.button(["役种设置","Yaku Setting"][lan]):
             yaku_set()
+    ipt_meld_check = []
     ipt1 = ful_hand(st.text_input(f"{["手牌（和的牌填最后）", "Hand（Put the winning tile at the end）"][lan]}",help=["例:123406789s11122z (和的牌是2z)","Example:123456789s11122z (2z is the winning tile)"][lan]).lower().replace(" ",""))
+    ipt1_list = re.findall(r"[0-9][mpsz]|w", ipt1)
+    while ipt1_list.count("w") > 1:
+        ipt1_list.remove("w")
+    ipt_meld_check.append(len(ipt1_list))
     col11, col12, col13, col14 = st.columns(4)
     with col11:
         ipt2 = ful_hand(st.text_input(f"{["副露1", "Meld1"][lan]}",help=["例:123s","Example:123s"][lan]).lower().replace(" ",""))
+        ipt2_list = re.findall(r"[0-9][mpsz]|a", ipt2)
+        if not ipt2:
+            ipt_meld_check.append(None)
+        elif meld_check(ipt2_list):
+            ipt_meld_check.append(True)
+        else:
+            ipt_meld_check.append(False)
     with col12:
         ipt3 = ful_hand(st.text_input(f"{["副露2", "Meld2"][lan]}",help=["例:444s","Example:444s"][lan]).lower().replace(" ",""))
+        ipt3_list = re.findall(r"[0-9][mpsz]|a", ipt3)
+        if not ipt3:
+            ipt_meld_check.append(None)
+        elif meld_check(ipt3_list):
+            ipt_meld_check.append(True)
+        else:
+            ipt_meld_check.append(False)
     with col13:
         ipt4 = ful_hand(st.text_input(f"{["副露3", "Meld3"][lan]}",help=["例:6666s","Example:6666s"][lan]).lower().replace(" ",""))
+        ipt4_list = re.findall(r"[0-9][mpsz]|a", ipt4)
+        if not ipt4:
+            ipt_meld_check.append(None)
+        elif meld_check(ipt4_list):
+            ipt_meld_check.append(True)
+        else:
+            ipt_meld_check.append(False)
     with col14:
         ipt5 = ful_hand(st.text_input(f"{["副露4", "Meld4"][lan]}",help=["例:8888sa","Example:8888sa"][lan]).lower().replace(" ",""))
+        ipt5_list = re.findall(r"[0-9][mpsz]|a", ipt5)
+        if not ipt5:
+            ipt_meld_check.append(None)
+        elif meld_check(ipt5_list):
+            ipt_meld_check.append(True)
+        else:
+            ipt_meld_check.append(False)
     with st.expander(["如何输入手牌","How To Input Tiles"][lan]):
         st.image("https://blog-imgs-136.fc2.com/k/o/n/konoyonohana/mahjong01.png")
         if lan == 0:
@@ -2044,13 +2087,24 @@ if page == 1:
     try:
         jingaoxiaoxi = ""
         ipt_all_tiles = re.findall(r"[0-9][mpsz]", ipt1+ipt2+ipt3+ipt4+ipt5+ipt8+"7z"*ipt12)
+        if "枪杠" in ipt7 and ipt6 == "荣":
+            ipt_all_tiles.append(ipt1[-2:])
+            ipt_all_tiles.append(ipt1[-2:])
+            ipt_all_tiles.append(ipt1[-2:])
+        for ipt_index, ipt_tile in enumerate(ipt_all_tiles):
+            if ipt_tile in ["0s","0m","0p"]:
+                ipt_all_tiles[ipt_index] = "5"+ipt_tile[1]
         SUOYOUPAI = ["1m","2m","3m","4m","5m","6m","7m","8m","9m",
                     "1s","2s","3s","4s","5s","6s","7s","8s","9s",
                     "1p","2p","3p","4p","5p","6p","7p","8p","9p",
-                    "1z","2z","3z","4z","5z","6z","7z"]
+                    "1z","2z","3z","4z","5z","6z","7z","0z","8z","9z"]
+        BUYUNXUPAI = ["0z","8z","9z"]
         for pai in SUOYOUPAI:
             if ipt_all_tiles.count(pai) > 4:
-                jingaoxiaoxi += f"警告：发现了{ipt_all_tiles.count(pai)}张{pai}\n"
+                jingaoxiaoxi += [f"警告：发现了{ipt_all_tiles.count(pai)}张{pai}\n",f"Warning：Found {ipt_all_tiles.count(pai)} of {pai}\n"][lan]
+        for pai in BUYUNXUPAI:
+            if pai in ipt_all_tiles:
+                jingaoxiaoxi += [f"警告：{pai}是不被定义的牌\n",f"Warning：{pai} is Undefined\n"][lan]
     except Exception as e:
         pass
     try:
@@ -2158,7 +2212,55 @@ if page == 1:
                     st.text(jingaoxiaoxi)
 
     except Exception:
+        def meld_find_problem(fp_meld):
+            letter_number = 0 + ("s" in fp_meld) + ("m" in fp_meld) + ("p" in fp_meld) + ("z" in fp_meld)
+            if letter_number == 0:
+                return ": 缺少花色(mspz)"
+            elif letter_number > 1:
+                return f": 发现{letter_number}种花色(只能是一种)"
+            fp_tiles = sorted(re.findall(r"[0-9][mpsz]", fp_meld))
+            if len(fp_tiles) > 4:
+                return f": 发现{len(fp_tiles)}张牌(最多4张)"
+            if len(fp_tiles) < 3:
+                return f": 发现{len(fp_tiles)}张牌(最少3张)"
+            if len(fp_tiles) == 4:
+                return f": 四张牌的副露必须是杠子(四张一样的)"
+            if len(fp_tiles) == 3:
+                if fp_tiles in [["0z","1z","2z"],["1z","2z","3z"],["2z","3z","4z"],["3z","4z","5z"],["4z","5z","6z"],["5z","6z","7z"],["6z","7z","8z"],["7z","8z","9z"]]:
+                    return f": 字牌不能组成顺子"
+                elif "z" in fp_meld:
+                    return ": 字牌副露必须是刻子(三张一样的)或杠子(四张一样的)"
+                else:
+                    return ": 三张牌的副露必须是顺子(三张连起来的)或刻子(三张一样的)"
+            
         st.text(["计算结果会自动输出，若无输出请重新检查输入 AwA","Results are generated automatically. If nothing appears, please double-check your input AwA"][lan])
+        txmessage = ""
+        meld_check_1234 = True
+        tile_number = ipt_meld_check[0] + 3*(bool(ipt_meld_check[1])+bool(ipt_meld_check[2])+bool(ipt_meld_check[3])+bool(ipt_meld_check[4]))
+        if ipt_meld_check[1] == False:
+            txmessage = f"副露1不符合标准{meld_find_problem(ipt2)}"
+            meld_check_1234 = False
+        elif ipt_meld_check[2] == False:
+            txmessage = f"副露2不符合标准"
+            meld_check_1234 = False
+        elif ipt_meld_check[3] == False:
+            txmessage = f"副露3不符合标准"
+            meld_check_1234 = False
+        elif ipt_meld_check[4] == False:
+            txmessage = f"副露4不符合标准"
+            meld_check_1234 = False
+        else:
+            if tile_number < 14:
+                if tile_number == 0:
+                    txmessage = ""
+                else:
+                    txmessage = f"需要额外{14-tile_number}张牌"
+            elif tile_number > 14:
+                txmessage = f"多出{tile_number-14}张牌"
+            else:
+                txmessage = f"手牌不符合和牌标准"
+        if txmessage:
+            st.error(txmessage)
 
 elif page == 2:
     han_fu_co_point = {"1番30符": (1000, 300, 500), "1番40符": (1300, 400, 700), "1番50符": (1600, 400, 800),
@@ -2727,7 +2829,7 @@ if page == 3:
             tenpai_wind2 = st.selectbox(["自风","Seat Wind"][lan], [["东", "南", "西", "北"],["East","South","West","North"]][lan], key="t2")
             if lan == 1:
                 tenpai_wind2 = {"East": "东", "South": "南", "West": "西", "North": "北"}[tenpai_wind2]
-        tenpai_double_yakuman = st.checkbox(["国士无双十三面，纯正九莲宝灯，四暗刻单骑，大四喜是双倍役满","Kokushi Muso Juusanmen, Junsei Churen Poto, Suu Ankou Tanki, Dai Suushi are double yakuman"][lan],value=True,key="t9")
+        tenpai_double_yakuman = st.checkbox(["国士无双十三面，纯正九莲宝灯，四暗刻单骑，大四喜是双倍役满","Kokushi Muso Juusanmen, Junsei Churen Poto, Suu Ankou Tanki, Dai Suushi are Double Yakuman"][lan],value=True,key="t9")
     with col124:
         tenpai_ignore = st.toggle(["忽视已拿4张的听牌","Ignoring Tenpai With 4 Tiles Already Had"][lan], value=True)
 
