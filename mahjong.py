@@ -2215,7 +2215,7 @@ if page == 1:
         def meld_find_problem(fp_meld):
             letter_number = 0 + ("s" in fp_meld) + ("m" in fp_meld) + ("p" in fp_meld) + ("z" in fp_meld)
             if letter_number == 0:
-                return ": 缺少花色(mspz)"
+                return ": 缺少mspz花色"
             elif letter_number > 1:
                 return f": 发现{letter_number}种花色(只能是一种)"
             fp_tiles = sorted(re.findall(r"[0-9][mpsz]", fp_meld))
@@ -2241,24 +2241,29 @@ if page == 1:
             txmessage = f"副露1不符合标准{meld_find_problem(ipt2)}"
             meld_check_1234 = False
         elif ipt_meld_check[2] == False:
-            txmessage = f"副露2不符合标准"
+            txmessage = f"副露2不符合标准{meld_find_problem(ipt3)}"
             meld_check_1234 = False
         elif ipt_meld_check[3] == False:
-            txmessage = f"副露3不符合标准"
+            txmessage = f"副露3不符合标准{meld_find_problem(ipt4)}"
             meld_check_1234 = False
         elif ipt_meld_check[4] == False:
-            txmessage = f"副露4不符合标准"
+            txmessage = f"副露4不符合标准{meld_find_problem(ipt5)}"
             meld_check_1234 = False
         else:
-            if tile_number < 14:
-                if tile_number == 0:
-                    txmessage = ""
-                else:
-                    txmessage = f"需要额外{14-tile_number}张牌"
+            if not ipt1 and not ipt2 and not ipt3 and not ipt4 and not ipt5:
+                txmessage = ""
+            elif tile_number < 14:
+                txmessage = f"需要额外{14-tile_number}张牌"
             elif tile_number > 14:
                 txmessage = f"多出{tile_number-14}张牌"
             else:
-                txmessage = f"手牌不符合和牌标准"
+                meld_number = 0 + bool(ipt2) + bool(ipt3) + bool(ipt4) + bool(ipt5)
+                if meld_number == 4:
+                    txmessage = f"手牌不符合和牌标准(需要1组对子)"
+                elif meld_number:
+                    txmessage = f"手牌不符合和牌标准(需要1组对子加{4-meld_number}组面子)"
+                else:
+                    txmessage = "手牌不符合和牌标准(需要1组对子加4组面子,或7组对子,或国士无双)"
         if txmessage:
             st.error(txmessage)
 
